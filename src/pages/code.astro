@@ -1,0 +1,56 @@
+---
+import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/NavBar.astro";
+---
+
+<Layout>
+
+<div class="h-screen flex flex-col">
+    <NavBar />
+    
+    <h3 class="text-center text-4xl font-bold my-4">CODE</h3>
+
+    <!-- Desktop Layout -->
+    <div class="hidden md:flex flex-1">
+        <!-- About Section -->
+        <div class="w-1/2 flex items-center p-8">
+            // About Section
+            <!-- <AboutSection Type="@AboutType.Code"/> -->
+        </div>
+
+        <!-- Scrollable Projects -->
+        <div class="w-1/2 p-8">
+            <div class="h-[calc(100vh-12rem)] overflow-y-auto pr-4 custom-scrollbar">
+                // Loop through code projects
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Layout -->
+    <div class="md:hidden px-4 pb-6 space-y-8">
+       // About section
+
+    // Loop through software projects
+    </div>
+</div>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: #262626;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #404040;
+        border-radius: 3px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #525252;
+    }
+</style>
+</Layout>
