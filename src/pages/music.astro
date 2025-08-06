@@ -1,26 +1,26 @@
 ---
-import NavBar from "../components/NavBar.tsx";
-import Layout from "../layouts/Layout.astro";
-import { getCollection } from 'astro:content';
+// import NavBar from "../components/NavBar.tsx";
+// import Layout from "../layouts/Layout.astro";
+// import { getCollection } from 'astro:content';
 
-export const prerender = true;
+// export const prerender = true;
 
 // Get all music projects, sorted by date (newest first)
-const musicProjects = await getCollection('music');
-const sortedMusicProjects = musicProjects.sort((a, b) =>
-    new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
-);
+// const musicProjects = await getCollection('music');
+// const sortedMusicProjects = musicProjects.sort((a, b) =>
+//     new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+// );
 ---
-
+<!-- 
 <Layout>
     <div class="min-h-screen flex flex-col">
         <NavBar client:load />
 
         <h3 class="text-center text-4xl font-bold my-8">MUSIC</h3>
 
-        <!-- Desktop Layout -->
+        Desktop Layout
         <div class="hidden md:flex flex-1 max-w-7xl mx-auto w-full">
-            <!-- About Section -->
+            About Section
             <div class="w-1/2 flex flex-col justify-center p-8">
                 <h2 class="text-3xl font-bold mb-6">About My Music</h2>
                 <p class="text-gray-300 text-lg mb-8">
@@ -53,7 +53,7 @@ const sortedMusicProjects = musicProjects.sort((a, b) =>
                 </div>
             </div>
 
-            <!-- Scrollable Projects -->
+            Scrollable Projects
             <div class="w-1/2 p-8">
                 <div class="h-[calc(100vh-16rem)] overflow-y-auto pr-4 custom-scrollbar">
                     <div class="space-y-6">
@@ -115,9 +115,9 @@ const sortedMusicProjects = musicProjects.sort((a, b) =>
             </div>
         </div>
 
-        <!-- Mobile Layout -->
+        Mobile Layout
         <div class="md:hidden px-4 pb-6 space-y-8">
-            <!-- About section -->
+            About section
             <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
                 <h2 class="text-2xl font-bold mb-4">About My Music</h2>
                 <p class="text-gray-300 mb-4">
@@ -133,7 +133,7 @@ const sortedMusicProjects = musicProjects.sort((a, b) =>
                 </div>
             </div>
 
-            <!-- Mobile Projects -->
+            Mobile Projects
             <div class="space-y-4">
                 {sortedMusicProjects.map((project) => (
                         <article class="bg-zinc-900 rounded-lg p-4 border border-gray-700">
@@ -208,4 +208,4 @@ const sortedMusicProjects = musicProjects.sort((a, b) =>
     .custom-scrollbar::-webkit-scrollbar-thumb:hover {
         background: #525252;
     }
-</style>
+</style> -->
