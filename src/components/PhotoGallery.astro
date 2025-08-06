@@ -1,0 +1,107 @@
+---
+export const prerender = false;
+
+const runtime = Astro.locals.runtime;
+const bucket = runtime.env.PHOTOGRAPHY;
+
+let images = [];
+
+try {
+    // List all objects in the bucket
+    const listResult = await bucket.list();
+
+    // Filter for image files and create image objects
+    images = listResult.objects
+        .filter(obj => {
+            const ext = obj.key.toLowerCase().split('.').pop();
+            return ['jpg', 'jpeg', 'png', 'gif', 'webp'].includes(ext);
+        })
+        .map(obj => ({
+            key: obj.key,
+            url: `/api/photos/${obj.key}`, // We'll create this API endpoint
+            size: obj.size,
+            lastModified: obj.uploaded
+        }));
+
+} catch (error) {
+    console.error('Error fetching images from R2:', error);
+}
+---
+
+<div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 xl:columns-5 gap-3 p-5">
+    {images.map((image) => (
+            <div
+                    class="mb-4 break-inside-avoid overflow-hidden relative group cursor-pointer transition-transform duration-300 hover:scale-105"
+                    onclick={`openModal('${image.url}')`}
+            >
+                <img
+                        src={image.url}
+                        alt={image.key}
+                        class="w-full h-auto object-cover"
+                        loading="lazy"
+                />
+                <div class="absolute inset-0 bg-black bg-opacity-50 opacity-0 group-hover:opacity-60 transition-opacity duration-300 flex items-center justify-center">
+                    <svg class="w-12 h-12 text-white drop-shadow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v6m3-3H7" />
+                    </svg>
+                </div>
+            </div>
+    ))}
+</div>
+
+<!-- Modal -->
+<div
+        id="modal"
+        class="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4 hidden"
+        onclick="closeModal()"
+>
+    <div
+            class="relative max-w-5xl w-full bg-tr rounded-xl overflow-hidden shadow-xl animate-fade-in"
+            onclick="event.stopPropagation()"
+    >
+        <button
+                class="absolute top-4 right-4 text-white bg-black bg-opacity-70 hover:bg-red-600 rounded-full w-10 h-10 flex items-center justify-center z-10"
+                onclick="closeModal()"
+                aria-label="Close"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+
+        <div class="flex items-center justify-center min-h-[200px]">
+            <img
+                    id="modal-image"
+                    src=""
+                    alt="Full size image"
+                    class="max-w-full max-h-[80vh] object-contain rounded-xl"
+                    onload="onImageLoad()"
+            />
+            <div id="spinner" class="absolute inset-0 flex items-center justify-center">
+                <div class="w-12 h-12 border-4 border-white border-t-blue-500 rounded-full animate-spin"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal JavaScript -->
+<script is:inline>
+    const modal = document.getElementById('modal');
+    const modalImage = document.getElementById('modal-image');
+    const spinner = document.getElementById('spinner');
+
+    function openModal(imageUrl) {
+        modalImage.src = imageUrl;
+        modal.classList.remove('hidden');
+        spinner.classList.remove('hidden');
+    }
+
+    function closeModal() {
+        modal.classList.add('hidden');
+        modalImage.src = '';
+    }
+
+    function onImageLoad() {
+        spinner.classList.add('hidden');
+    }
+</script>

@@ -1,0 +1,14 @@
+---
+import Layout from "../layouts/Layout.astro";
+import NavBar from "../components/NavBar.astro";
+import PhotoGallery from "../components/PhotoGallery.astro";
+export const prerender = false;
+---
+
+<Layout>
+    <NavBar />
+
+    <h2 class="text-2xl font-bold m-4 text-center ">Image Gallery</h2>
+
+    <PhotoGallery />
+</Layout>
