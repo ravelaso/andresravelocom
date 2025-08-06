@@ -1,4 +1,5 @@
 ---
+type: project
 title: "Personal Portfolio Website"
 description: "A modern portfolio built with Astro, React, and Tailwind CSS"
 date: 2024-12-01

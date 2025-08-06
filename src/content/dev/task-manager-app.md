@@ -1,4 +1,5 @@
 ---
+type: project
 title: "Task Manager Pro"
 description: "A collaborative task management application with real-time updates"
 date: 2024-10-15

@@ -2,60 +2,109 @@
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/NavBar.tsx";
 import DevCard from "@/components/DevCard.astro";
-import { getCollection } from "astro:content";
+import { getCollection, type CollectionEntry } from "astro:content";
 
 export const prerender = true;
 
-const codeProjects = await getCollection("code");
-const sortedProjects = codeProjects.sort(
-  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+// Base type
+type DevEntry = CollectionEntry<"dev">;
+
+// Type guards
+function isProject(
+  entry: DevEntry,
+): entry is DevEntry & { data: { type: "project"; date: Date } } {
+  return entry.data.type === "project";
+}
+
+function isAbout(
+  entry: DevEntry,
+): entry is DevEntry & {
+  data: {
+    type: "about";
+    frontend?: string[];
+    backend?: string[];
+    cloud?: string[];
+  };
+} {
+  return entry.data.type === "about";
+}
+
+// Get entries
+const devEntries = await getCollection("dev");
+
+// Narrow entries
+const aboutEntry = devEntries.find(isAbout);
+const projects = devEntries.filter(isProject);
+
+// Sort projects
+const sortedProjects = projects.sort(
+  (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
 );
+
+// Access skills safely
+const frontend = aboutEntry?.data.frontend ?? [];
+const backend = aboutEntry?.data.backend ?? [];
+const cloud = aboutEntry?.data.cloud ?? [];
 ---
 
 <Layout>
   <NavBar client:load />
 
-  <!-- Page Header -->
-  <section class="max-w-5xl mx-auto px-4 mt-12 mb-20">
-    <h1 class="text-4xl font-bold text-center text-neutral-100 mb-4">Development Work</h1>
-    <p class="text-center text-neutral-400 text-lg max-w-2xl mx-auto">
-      A collection of practical tools and sites I’ve built using modern web technologies.
-    </p>
-  </section>
+  <!-- About + Skills Combined -->
+  <section
+    class="max-w-5xl mx-auto px-4 mt-12 mb-24 grid md:grid-cols-2 gap-12 items-start"
+  >
+    <!-- About Text -->
+    <div>
+      <h1 class="text-4xl font-bold text-neutral-100 mb-4">Development Work</h1>
+      <p class="text-neutral-400 text-lg">
+        {
+          aboutEntry?.data.description ??
+            "A collection of practical tools and sites I’ve built using modern web technologies."
+        }
+      </p>
+    </div>
 
-  <!-- Skills Section -->
-  <section class="max-w-5xl mx-auto px-4 mb-24 space-y-12">
-    <div class="grid md:grid-cols-3 gap-8">
+    <!-- Skills List -->
+    <div class="space-y-8">
       <div>
         <h3 class="text-lg font-semibold text-neutral-100 mb-2">Frontend</h3>
         <ul class="flex flex-wrap gap-2">
-          {["React", "Astro", "TypeScript", "Next.js", "Tailwind CSS"].map((tech) => (
-            <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
-              {tech}
-            </li>
-          ))}
+          {
+            frontend.map((tech) => (
+              <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
+                {tech}
+              </li>
+            ))
+          }
         </ul>
       </div>
 
       <div>
         <h3 class="text-lg font-semibold text-neutral-100 mb-2">Backend</h3>
         <ul class="flex flex-wrap gap-2">
-          {["Node.js", "Python", "PostgreSQL", "MongoDB", "Redis"].map((tech) => (
-            <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
-              {tech}
-            </li>
-          ))}
+          {
+            backend.map((tech) => (
+              <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
+                {tech}
+              </li>
+            ))
+          }
         </ul>
       </div>
 
       <div>
-        <h3 class="text-lg font-semibold text-neutral-100 mb-2">Cloud & DevOps</h3>
+        <h3 class="text-lg font-semibold text-neutral-100 mb-2">
+          Cloud & DevOps
+        </h3>
         <ul class="flex flex-wrap gap-2">
-          {["Cloudflare", "Vercel", "AWS", "Docker", "GitHub Actions"].map((tech) => (
-            <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
-              {tech}
-            </li>
-          ))}
+          {
+            cloud.map((tech) => (
+              <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
+                {tech}
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>
@@ -63,8 +112,6 @@ const sortedProjects = codeProjects.sort(
 
   <!-- Projects List -->
   <section class="max-w-5xl mx-auto px-4 space-y-16 pb-32">
-    {sortedProjects.map((project) => (
-      <DevCard project={project} />
-    ))}
+    {projects.map((project) => <DevCard project={project} />)}
   </section>
 </Layout>

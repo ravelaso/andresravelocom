@@ -4,16 +4,22 @@ import Layout from '@/layouts/Layout.astro';
 import NavBar from '@/components/NavBar';
 import { Image } from 'astro:assets';
 
+// Type
+type DevEntry = CollectionEntry<'dev'>;
+
+
 export async function getStaticPaths() {
-  const codeProjects = await getCollection('code');
-  return codeProjects.map((project) => ({
+  const devEntries = await getCollection('dev');
+  const projects = devEntries.filter((entry) => entry.data.type === 'project');
+  return projects.map((project) => ({
     params: { slug: project.slug },
     props: { project },
   }));
 }
 
+// Props
 type Props = {
-  project: CollectionEntry<'code'>;
+  project: DevEntry & { data: { type: 'project'; date: Date } };
 };
 
 const { project } = Astro.props;
@@ -42,10 +48,9 @@ const { Content } = await project.render();
         {project.data.category && ` • ${project.data.category}`}
       </p>
 
-      <!-- Tags or Tech -->
       {project.data.tech && (
         <div class="flex flex-wrap gap-2 mt-4">
-          {project.data.tech.map((tech) => (
+          {project.data.tech.map((tech: string) => (
             <span class="bg-neutral-800 text-neutral-300 text-sm px-3 py-1 rounded-full border border-neutral-700">
               {tech}
             </span>

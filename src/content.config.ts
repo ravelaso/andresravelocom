@@ -19,20 +19,33 @@ const musicCollection = defineCollection({
     })
 });
 
-const codeCollection = defineCollection({
-    type: 'content',
-    schema : ({image}) => z.object({
+const devCollection = defineCollection({
+  type: 'content',
+  schema: ({ image }) =>
+    z.discriminatedUnion('type', [
+      // Project type (existing structure)
+      z.object({
+        type: z.literal('project'),
         title: z.string(),
         description: z.string(),
         date: z.date(),
         tags: z.array(z.string()).optional(),
         url: z.string().optional(),
-        tech: z.array(z.string()).optional(), // Technologies used
+        tech: z.array(z.string()).optional(),
         category: z.enum(['web', 'mobile', 'desktop', 'library', 'tool']).optional(),
         coverImage: image(),
-    })
+      }),
+      // About type (new structure)
+      z.object({
+        type: z.literal('about'),
+        title: z.string(),
+        description: z.string().optional(),
+        frontend: z.array(z.string()).optional(),
+        backend: z.array(z.string()).optional(),
+        cloud: z.array(z.string()).optional(),
+      }),
+    ]),
 });
-
 
 const photographyCollection = defineCollection({
     type: 'content',
@@ -46,6 +59,6 @@ const photographyCollection = defineCollection({
 
 export const collections = {
     'music': musicCollection,
-    'code': codeCollection,
+    'dev': devCollection,
     'photography': photographyCollection,
 };
