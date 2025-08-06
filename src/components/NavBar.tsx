@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import NavigationButton from './NavigationButton';
 
 interface NavItem {
     href: string;
@@ -96,26 +97,23 @@ const NavBar: React.FC = () => {
                             {navItems.map((item) => {
                                 const isActive = currentPath === item.href;
                                 return (
-                                    <a
+                                    <NavigationButton
                                         key={item.href}
                                         href={item.href}
-                                        className={`group px-5 py-2 rounded-full border-2 transition-all duration-300 flex items-center ${
-                                            isActive
-                                                ? 'border-white bg-white/10 text-white'
-                                                : 'border-gray-600 hover:border-white hover:bg-white/5'
-                                        }`}
+                                        isActive={isActive}
+                                        className="px-5 py-2"
                                     >
-                    <span className={`mr-2 transition-colors duration-300 ${
-                        isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
-                    }`}>
-                      {item.icon}
-                    </span>
+                                        <span className={`mr-2 transition-colors duration-300 ${
+                                            isActive ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                                        }`}>
+                                            {item.icon}
+                                        </span>
                                         <span className={`transition-colors ${
                                             isActive ? 'text-white' : 'text-gray-300 group-hover:text-white'
                                         }`}>
-                      {item.shortLabel}
-                    </span>
-                                    </a>
+                                            {item.shortLabel}
+                                        </span>
+                                    </NavigationButton>
                                 );
                             })}
                         </nav>
@@ -129,9 +127,9 @@ const NavBar: React.FC = () => {
                                 aria-expanded={isMenuOpen}
                             >
                                 <div className="w-6 h-6 flex flex-col justify-center space-y-1">
-                  <span className={`block h-0.5 bg-current transform transition-all duration-300 ${
-                      isMenuOpen ? 'rotate-45 translate-y-1.5' : ''
-                  }`} />
+                                    <span className={`block h-0.5 bg-current transform transition-all duration-300 ${
+                                        isMenuOpen ? 'rotate-45 translate-y-1.5' : ''
+                                    }`} />
                                     <span className={`block h-0.5 bg-current transition-all duration-300 ${
                                         isMenuOpen ? 'opacity-0' : ''
                                     }`} />
@@ -177,13 +175,13 @@ const NavBar: React.FC = () => {
                                     animation: isMenuOpen ? 'slideInFromRight 0.3s ease-out forwards' : 'none'
                                 }}
                             >
-                <span className={`mr-4 p-2 rounded-lg transition-all duration-200 ${
-                    isActive
-                        ? 'bg-white/20 text-white'
-                        : 'bg-gray-800 text-gray-400 group-hover:bg-white/10 group-hover:text-white'
-                }`}>
-                  {item.icon}
-                </span>
+                                <span className={`mr-4 p-2 rounded-lg transition-all duration-200 ${
+                                    isActive
+                                        ? 'bg-white/20 text-white'
+                                        : 'bg-gray-800 text-gray-400 group-hover:bg-white/10 group-hover:text-white'
+                                }`}>
+                                    {item.icon}
+                                </span>
                                 <div className="flex-1">
                                     <span className="text-lg font-medium">{item.label}</span>
                                     {isActive && (
@@ -207,17 +205,17 @@ const NavBar: React.FC = () => {
             <div className="h-16"></div>
 
             <style>{`
-        @keyframes slideInFromRight {
-          from {
-            transform: translateX(100%);
-            opacity: 0;
-          }
-          to {
-            transform: translateX(0);
-            opacity: 1;
-          }
-        }
-      `}</style>
+                @keyframes slideInFromRight {
+                    from {
+                        transform: translateX(100%);
+                        opacity: 0;
+                    }
+                    to {
+                        transform: translateX(0);
+                        opacity: 1;
+                    }
+                }
+            `}</style>
         </>
     );
 };

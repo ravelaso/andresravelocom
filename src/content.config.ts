@@ -33,7 +33,7 @@ const devCollection = defineCollection({
         url: z.string().optional(),
         tech: z.array(z.string()).optional(),
         category: z.enum(['web', 'mobile', 'desktop', 'library', 'tool']).optional(),
-        coverImage: image(),
+        coverImage: image().optional(),
       }),
       // About type (new structure)
       z.object({

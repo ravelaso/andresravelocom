@@ -2,12 +2,11 @@
 type: project
 title: "Personal Portfolio Website"
 description: "A modern portfolio built with Astro, React, and Tailwind CSS"
-date: 2024-12-01
+date: 2025-08-04
 tags: ["astro", "react", "typescript", "tailwindcss"]
-url: "https://github.com/username/portfolio"
+url: "https://github.com/ravelaso/andresravelocom"
 tech: ["Astro", "React", "TypeScript", "Tailwind CSS", "Cloudflare Pages", "Cloudflare R2"]
 category: "web"
-coverImage: "@/assets/photogallerybackground.jpg"
 ---
 
 # Personal Portfolio Website
