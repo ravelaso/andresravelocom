@@ -53,7 +53,7 @@ const NavBar: React.FC = () => {
         //     )
         // },
         {
-            href: '/code/',
+            href: '/dev/',
             label: 'Development',
             shortLabel: 'Dev',
             icon: (

@@ -21,23 +21,31 @@ const musicCollection = defineCollection({
 
 const codeCollection = defineCollection({
     type: 'content',
-    schema: z.object({
+    schema : ({image}) => z.object({
         title: z.string(),
         description: z.string(),
         date: z.date(),
         tags: z.array(z.string()).optional(),
-        featured: z.boolean().default(false),
-        githubUrl: z.string().optional(),
-        liveUrl: z.string().optional(),
+        url: z.string().optional(),
         tech: z.array(z.string()).optional(), // Technologies used
         category: z.enum(['web', 'mobile', 'desktop', 'library', 'tool']).optional(),
-        status: z.enum(['completed', 'in-progress', 'archived']).default('completed'),
-        coverImage: z.string().optional(),
-        screenshots: z.array(z.string()).optional(),
+        coverImage: image(),
     })
+});
+
+
+const photographyCollection = defineCollection({
+    type: 'content',
+    schema: z.object({
+        type: z.enum(['about', 'camera', 'lens']),
+        title: z.string(),
+        description: z.string().optional(),
+        details: z.array(z.string()).optional(), // For cameras or lenses
+    }),
 });
 
 export const collections = {
     'music': musicCollection,
     'code': codeCollection,
+    'photography': photographyCollection,
 };

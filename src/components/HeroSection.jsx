@@ -315,13 +315,13 @@ const HeroSection = () => {
                             <span className="text-gray-300 group-hover:text-white transition-colors duration-300">Music</span>
                         </a> */}
 
-                        <a href="/code" className="group flex items-center px-6 py-3 rounded-full border-2 border-gray-600 hover:border-white transition-all duration-300 hover:bg-white/5">
+                        <a href="/dev" className="group flex items-center px-6 py-3 rounded-full border-2 border-gray-600 hover:border-white transition-all duration-300 hover:bg-white/5">
                             <div className="w-10 h-10 mr-4 rounded-full border border-gray-500 group-hover:border-white flex items-center justify-center transition-all duration-300">
                                 <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
                                     <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633zM5.707 6.293a1 1 0 010 1.414L3.414 10l2.293 2.293a1 1 0 11-1.414 1.414l-3-3a1 1 0 010-1.414l3-3a1 1 0 011.414 0zm8.586 0a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 11-1.414-1.414L16.586 10l-2.293-2.293a1 1 0 010-1.414z" clipRule="evenodd"/>
                                 </svg>
                             </div>
-                            <span className="text-gray-300 group-hover:text-white transition-colors duration-300">Code</span>
+                            <span className="text-gray-300 group-hover:text-white transition-colors duration-300">Development</span>
                         </a>
 
                         <a href="/photography" className="group flex items-center px-6 py-3 rounded-full border-2 border-gray-600 hover:border-white transition-all duration-300 hover:bg-white/5">

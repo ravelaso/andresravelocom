@@ -3,13 +3,10 @@ title: "Task Manager Pro"
 description: "A collaborative task management application with real-time updates"
 date: 2024-10-15
 tags: ["react", "nodejs", "websockets", "mongodb"]
-featured: true
-githubUrl: "https://github.com/username/task-manager"
-liveUrl: "https://taskmanager-pro.com"
+url: "https://taskmanager-pro.com"
 tech: ["React", "Node.js", "Express", "MongoDB", "Socket.io", "JWT"]
 category: "web"
-status: "completed"
-screenshots: ["/images/projects/taskmanager-1.jpg", "/images/projects/taskmanager-2.jpg"]
+coverImage: "@/assets/photogallerybackground.jpg"
 ---
 
 # Task Manager Pro

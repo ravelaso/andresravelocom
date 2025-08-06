@@ -1,7 +1,7 @@
 ---
 import { getCollection, type CollectionEntry } from 'astro:content';
-import Layout from '../../layouts/Layout.astro';
-import NavBar from '../../components/NavBar.tsx';
+import Layout from '@/layouts/Layout.astro';
+import NavBar from '@/components/NavBar.tsx';
 
 export async function getStaticPaths() {
     const musicProjects = await getCollection('music');

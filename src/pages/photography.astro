@@ -1,7 +1,9 @@
 ---
-import Layout from "../layouts/Layout.astro";
-import NavBar from "../components/NavBar";
-import PhotoGallery from "../components/PhotoGallery.tsx";
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/NavBar";
+import PhotoGallery from "@/components/PhotoGallery.tsx";
+
+import { getCollection } from "astro:content";
 
 export const prerender = false;
 
@@ -22,21 +24,112 @@ interface ApiResponse {
 let initialData: ApiResponse = {
     images: [],
     hasMore: false,
-    cursor: null
+    cursor: null,
 };
 
 try {
-    const response = await fetch(new URL('/api/photos?limit=12', Astro.url));
+    const response = await fetch(new URL("/api/photos?limit=12", Astro.url));
     if (response.ok) {
         initialData = await response.json();
     }
 } catch (error) {
-    console.error('Error loading initial images:', error);
+    console.error("Error loading initial images:", error);
 }
+
+const aboutContent = await getCollection(
+    "photography",
+    (entry) => entry.data.type === "about",
+);
+const cameraContent = await getCollection(
+    "photography",
+    (entry) => entry.data.type === "camera",
+);
+const lensContent = await getCollection(
+    "photography",
+    (entry) => entry.data.type === "lens",
+);
+
+const about = aboutContent[0];
+const cameras = cameraContent[0];
+const lenses = lensContent[0];
+
+import photogallerybg from "@/assets/photogallerybackground.jpg";
+
+const style = `
+        background-image: url('${photogallerybg.src}');
+`;
 ---
 
 <Layout>
-    <NavBar client:load/>
-    <h2 class="text-2xl font-bold m-4 text-center">Image Gallery</h2>
+    <NavBar client:load />
+
+    <!-- Page Heading -->
+    <section
+        class="relative w-full bg-cover md:bg-contain bg-center py-20 px-4"
+        style={style}
+    >
+        <div
+            class="bg-black/60 backdrop-blur-sm p-8 rounded-xl max-w-4xl mx-auto text-center"
+        >
+            <h1 class="text-4xl md:text-5xl font-extrabold text-white">
+                {about.data.title}
+            </h1>
+            <p class="text-lg md:text-xl text-gray-300 mt-4">
+                {about.data.description}
+            </p>
+        </div>
+    </section>
+
+    <!-- Camera + Lens Section -->
+    <section class="max-w-7xl mx-auto px-4 md:px-8 mt-16">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Cameras -->
+            <div
+                class="bg-neutral-950 rounded-2xl shadow-xl p-8 border border-gray-700"
+            >
+                <h2 class="text-2xl font-bold mb-4 text-white">
+                    {cameras.data.title}
+                </h2>
+                <ul class="text-gray-300 text-lg space-y-3">
+                    {
+                        cameras.data.details!.map((camera) => (
+                            <li class="flex items-center gap-2">
+                                <span class="text-xl">📷</span>
+                                <span>{camera}</span>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+
+            <!-- Lenses -->
+            <div
+                class="bg-neutral-950 rounded-2xl shadow-xl p-8 border border-gray-700"
+            >
+                <h2 class="text-2xl font-bold mb-4 text-white">
+                    {lenses.data.title}
+                </h2>
+                <ul class="text-gray-300 text-lg space-y-3">
+                    {
+                        lenses.data.details!.map((lens) => (
+                            <li class="flex items-center gap-2">
+                                <span class="text-xl">🔭</span>
+                                <span>{lens}</span>
+                            </li>
+                        ))
+                    }
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Heading -->
+    <h2
+        class="text-3xl md:text-4xl font-bold text-center text-white mt-24 mb-8"
+    >
+        Image Gallery
+    </h2>
+
+    <!-- Gallery Component -->
     <PhotoGallery client:load initialData={initialData} />
 </Layout>
