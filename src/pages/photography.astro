@@ -1,14 +1,42 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import NavBar from "../components/NavBar.astro";
-import PhotoGallery from "../components/PhotoGallery.astro";
+import PhotoGallery from "../components/PhotoGallery.tsx";
+
 export const prerender = false;
+
+interface PhotoObject {
+    key: string;
+    url: string;
+    size: number;
+    lastModified: string;
+}
+
+interface ApiResponse {
+    images: PhotoObject[];
+    hasMore: boolean;
+    cursor: string | null;
+}
+
+// Load initial data on server-side
+let initialData: ApiResponse = {
+    images: [],
+    hasMore: false,
+    cursor: null
+};
+
+try {
+    const response = await fetch(new URL('/api/photos?limit=12', Astro.url));
+    if (response.ok) {
+        initialData = await response.json();
+    }
+} catch (error) {
+    console.error('Error loading initial images:', error);
+}
 ---
 
 <Layout>
     <NavBar />
-
-    <h2 class="text-2xl font-bold m-4 text-center ">Image Gallery</h2>
-
-    <PhotoGallery />
+    <h2 class="text-2xl font-bold m-4 text-center">Image Gallery</h2>
+    <PhotoGallery client:load initialData={initialData} />
 </Layout>

@@ -19,7 +19,7 @@
 		"enabled": true
 	},
     "r2_buckets": [
-      { "binding": "PHOTOGRAPHY", "bucket_name": "photography" }
+      { "binding": "PHOTOGRAPHY", "bucket_name": "photography", "experimental_remote": true}
     ]
 	/**
 	 * Smart Placement
