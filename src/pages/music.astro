@@ -1,39 +1,195 @@
 ---
-import NavBar from "../components/NavBar.astro";
+import NavBar from "../components/NavBar.tsx";
 import Layout from "../layouts/Layout.astro";
+import { getCollection } from 'astro:content';
+
+export const prerender = true;
+
+// Get all music projects, sorted by date (newest first)
+const musicProjects = await getCollection('music');
+const sortedMusicProjects = musicProjects.sort((a, b) =>
+    new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
+);
 ---
 
 <Layout>
-    <div class="h-screen flex flex-col">
-        <NavBar />
+    <div class="min-h-screen flex flex-col">
+        <NavBar client:load />
 
-        <h3 class="text-center text-4xl font-bold my-4">MUSIC</h3>
+        <h3 class="text-center text-4xl font-bold my-8">MUSIC</h3>
 
         <!-- Desktop Layout -->
-        <div class="hidden md:flex flex-1">
+        <div class="hidden md:flex flex-1 max-w-7xl mx-auto w-full">
             <!-- About Section -->
-            <div class="w-1/2 flex items-center p-8">
-                // About Section
-                <!-- <AboutSection Type="@AboutType.Music"/> -->
+            <div class="w-1/2 flex flex-col justify-center p-8">
+                <h2 class="text-3xl font-bold mb-6">About My Music</h2>
+                <p class="text-gray-300 text-lg mb-8">
+                    I create electronic music that blends ambient textures with rhythmic elements,
+                    exploring the intersection of technology and emotion through sound.
+                </p>
+
+                <div class="space-y-4">
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Genres</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {['Ambient', 'Electronic', 'Progressive House', 'Chill', 'Experimental'].map(genre => (
+                                    <span key={genre} class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm border border-gray-600">
+                                    {genre}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-semibold mb-3">Tools</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {['Ableton Live', 'Logic Pro', 'Native Instruments', 'Serum', 'Hardware Synths'].map(tool => (
+                                    <span key={tool} class="bg-gray-800 text-gray-300 px-3 py-1 rounded-full text-sm border border-gray-600">
+                                    {tool}
+                                </span>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Scrollable Projects -->
             <div class="w-1/2 p-8">
-                <div class="h-[calc(100vh-12rem)] overflow-y-auto pr-4 custom-scrollbar">
-                    // Loop of Music Projects
+                <div class="h-[calc(100vh-16rem)] overflow-y-auto pr-4 custom-scrollbar">
+                    <div class="space-y-6">
+                        {sortedMusicProjects.map((project) => (
+                                <article class="bg-zinc-900 rounded-lg p-6 border border-gray-700 hover:border-gray-500 transition-all duration-300 group">
+                                    <div class="flex items-start justify-between mb-4">
+                                        <div class="flex-1">
+                                            <h3 class="text-xl font-semibold mb-2 group-hover:text-white transition-colors">
+                                                <a href={`/music/${project.slug}`}>{project.data.title}</a>
+                                            </h3>
+                                            <p class="text-gray-400 text-sm mb-2">
+                                                {project.data.date.toLocaleDateString('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'long',
+                                                    day: 'numeric'
+                                                })}
+                                            </p>
+                                        </div>
+                                        {project.data.duration && (
+                                                <span class="text-sm text-gray-400 bg-gray-800 px-3 py-1 rounded-full border border-gray-600">
+                                            {project.data.duration}
+                                        </span>
+                                        )}
+                                    </div>
+
+                                    <p class="text-gray-300 mb-4">{project.data.description}</p>
+
+                                    {project.data.tags && (
+                                            <div class="flex flex-wrap gap-2 mb-4">
+                                                {project.data.tags.map((tag: string) => (
+                                                        <span key={tag} class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded border border-gray-600">
+                                                {tag}
+                                            </span>
+                                                ))}
+                                            </div>
+                                    )}
+
+                                    <div class="flex gap-2">
+                                        <a
+                                                href={`/music/${project.slug}`}
+                                                class="px-4 py-2 bg-white text-black hover:bg-gray-200 rounded-lg transition-colors text-sm font-medium"
+                                        >
+                                            Read More
+                                        </a>
+                                        {project.data.spotifyUrl && (
+                                                <a
+                                                        href={project.data.spotifyUrl}
+                                                        target="_blank"
+                                                        class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition-colors text-sm border border-gray-600"
+                                                >
+                                                    Listen
+                                                </a>
+                                        )}
+                                    </div>
+                                </article>
+                        ))}
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- Mobile Layout -->
         <div class="md:hidden px-4 pb-6 space-y-8">
-            // About section
+            <!-- About section -->
+            <div class="bg-gray-900 rounded-lg p-6 border border-gray-700">
+                <h2 class="text-2xl font-bold mb-4">About My Music</h2>
+                <p class="text-gray-300 mb-4">
+                    I create electronic music that blends ambient textures with rhythmic elements,
+                    exploring the intersection of technology and emotion through sound.
+                </p>
+                <div class="flex flex-wrap gap-2">
+                    {['Ambient', 'Electronic', 'House', 'Chill'].map(genre => (
+                            <span key={genre} class="bg-gray-800 text-gray-300 px-2 py-1 rounded-full text-xs border border-gray-600">
+                            {genre}
+                        </span>
+                    ))}
+                </div>
+            </div>
 
-            // Loop of music projects
+            <!-- Mobile Projects -->
+            <div class="space-y-4">
+                {sortedMusicProjects.map((project) => (
+                        <article class="bg-zinc-900 rounded-lg p-4 border border-gray-700">
+                            <div class="flex items-start justify-between mb-3">
+                                <h3 class="text-lg font-semibold">
+                                    <a href={`/music/${project.slug}`} class="hover:text-white transition-colors">
+                                        {project.data.title}
+                                    </a>
+                                </h3>
+                                {project.data.duration && (
+                                        <span class="text-xs text-gray-400 bg-gray-800 px-2 py-1 rounded border border-gray-600">
+                                    {project.data.duration}
+                                </span>
+                                )}
+                            </div>
+
+                            <p class="text-gray-400 text-sm mb-2">
+                                {project.data.date.toLocaleDateString()}
+                            </p>
+
+                            <p class="text-gray-300 text-sm mb-3">{project.data.description}</p>
+
+                            {project.data.tags && (
+                                    <div class="flex flex-wrap gap-1 mb-3">
+                                        {project.data.tags.slice(0, 3).map((tag: string) => (
+                                                <span key={tag} class="text-xs bg-gray-800 text-gray-300 px-2 py-1 rounded border border-gray-600">
+                                        {tag}
+                                    </span>
+                                        ))}
+                                    </div>
+                            )}
+
+                            <div class="flex gap-2">
+                                <a
+                                        href={`/music/${project.slug}`}
+                                        class="px-3 py-1 bg-white text-black hover:bg-gray-200 rounded text-sm font-medium transition-colors"
+                                >
+                                    Read More
+                                </a>
+                                {project.data.spotifyUrl && (
+                                        <a
+                                                href={project.data.spotifyUrl}
+                                                target="_blank"
+                                                class="px-3 py-1 bg-gray-800 hover:bg-gray-700 rounded text-sm transition-colors border border-gray-600"
+                                        >
+                                            Listen
+                                        </a>
+                                )}
+                            </div>
+                        </article>
+                ))}
+            </div>
         </div>
     </div>
-
 </Layout>
+
 <style>
     .custom-scrollbar::-webkit-scrollbar {
         width: 6px;

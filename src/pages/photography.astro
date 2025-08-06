@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import NavBar from "../components/NavBar.astro";
+import NavBar from "../components/NavBar";
 import PhotoGallery from "../components/PhotoGallery.tsx";
 
 export const prerender = false;
@@ -36,7 +36,7 @@ try {
 ---
 
 <Layout>
-    <NavBar />
+    <NavBar client:load/>
     <h2 class="text-2xl font-bold m-4 text-center">Image Gallery</h2>
     <PhotoGallery client:load initialData={initialData} />
 </Layout>
