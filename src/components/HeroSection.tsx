@@ -1,15 +1,68 @@
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import NavigationButton from '@/components/NavigationButton';
 
-const HeroSection = () => {
-    const heroRef = useRef(null);
-    const animationRef = useRef(null);
-    const elementsDataRef = useRef([]);
-    const mouseRef = useRef({ x: 0, y: 0, isMoving: false });
+// Type definitions
+interface FloatingElement {
+    id: number;
+    top: number;
+    left: number;
+    svgPath: string;
+    sizeClass: string;
+    opacityClass: string;
+    colorClass: string;
+}
+
+interface ElementData {
+    element: HTMLElement;
+    id: number;
+    x: number;
+    y: number;
+    vx: number;
+    vy: number;
+    radius: number;
+    originalX: number;
+    originalY: number;
+}
+
+interface MouseRef {
+    x: number;
+    y: number;
+    isMoving: boolean;
+}
+
+interface AnimationConfig {
+    INITIAL_VELOCITY: number;
+    MAX_SPEED: number;
+    FRICTION: number;
+    RETURN_FORCE: number;
+    BOUNDARY_PUSH: number;
+    COLLISION_RADIUS: number;
+    COLLISION_FORCE: number;
+    MOUSE_DISTANCE: number;
+    MOUSE_REPEL_FORCE: number;
+    GLOW_MAX_SIZE: number;
+    SCALE_MAX: number;
+    TARGET_FPS: number;
+    BOUNDARY_MARGIN: number;
+    ICON_COUNT: {
+        mobile: number;
+        tablet: number;
+        desktop: number;
+        large: number;
+    };
+}
+
+type DeviceType = 'mobile' | 'tablet' | 'desktop' | 'large';
+
+const HeroSection: React.FC = () => {
+    const heroRef = useRef<HTMLElement>(null);
+    const animationRef = useRef<number | null>(null);
+    const elementsDataRef = useRef<ElementData[]>([]);
+    const mouseRef = useRef<MouseRef>({ x: 0, y: 0, isMoving: false });
 
     // Generate floating elements data
-    const generateFloatingElements = () => {
-        const svgIcons = [
+    const generateFloatingElements = (): FloatingElement[] => {
+        const svgIcons: string[] = [
             // Music note
             `<ellipse cx="7" cy="17" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/><path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" d="M9 17V6l7-2v11"/><ellipse cx="14" cy="15" rx="2" ry="1.5" stroke="currentColor" stroke-width="1.5" fill="currentColor"/>`,
 
@@ -20,11 +73,11 @@ const HeroSection = () => {
             `<path stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" d="m18 16 4-4-4-4M6 8l-4 4 4 4"/>`,
         ];
 
-        const sizes = ["w-6 h-6", "w-7 h-7", "w-8 h-8", "w-10 h-10"];
-        const opacities = ["opacity-50"];
-        const colors = ["text-gray-200"];
+        const sizes: string[] = ["w-6 h-6", "w-7 h-7", "w-8 h-8", "w-10 h-10"];
+        const opacities: string[] = ["opacity-50"];
+        const colors: string[] = ["text-gray-200"];
 
-        const elements = [];
+        const elements: FloatingElement[] = [];
         for (let i = 0; i < 50; i++) {
             elements.push({
                 id: i,
@@ -39,14 +92,14 @@ const HeroSection = () => {
         return elements;
     };
 
-    const [floatingElements] = useState(() => generateFloatingElements());
+    const [floatingElements] = useState<FloatingElement[]>(() => generateFloatingElements());
 
     useEffect(() => {
         const heroSection = heroRef.current;
         if (!heroSection) return;
 
         // Configuration
-        const CONFIG = {
+        const CONFIG: AnimationConfig = {
             INITIAL_VELOCITY: 0.03,
             MAX_SPEED: 0.08,
             FRICTION: 0.895,
@@ -61,14 +114,14 @@ const HeroSection = () => {
             TARGET_FPS: 60,
             BOUNDARY_MARGIN: 5,
             ICON_COUNT: {
-                mobile: 8,
-                tablet: 15,
+                mobile: 30,
+                tablet: 30,
                 desktop: 35,
                 large: 50
             }
         };
 
-        function getDeviceType() {
+        function getDeviceType(): DeviceType {
             const width = window.innerWidth;
             if (width < 640) return 'mobile';
             if (width < 1024) return 'tablet';
@@ -77,7 +130,7 @@ const HeroSection = () => {
         }
 
         // Get visible elements
-        const floatingDivs = heroSection.querySelectorAll('.floating-element');
+        const floatingDivs = heroSection.querySelectorAll('.floating-element') as NodeListOf<HTMLElement>;
         const targetIconCount = CONFIG.ICON_COUNT[getDeviceType()];
         const visibleElements = Array.from(floatingDivs).slice(0, targetIconCount);
 
@@ -117,7 +170,7 @@ const HeroSection = () => {
         }
 
         // Animation functions
-        function updatePositions() {
+        function updatePositions(): void {
             elementsDataRef.current.forEach(data => {
                 const dx = data.originalX - data.x;
                 const dy = data.originalY - data.y;
@@ -149,7 +202,7 @@ const HeroSection = () => {
             });
         }
 
-        function checkCollisions() {
+        function checkCollisions(): void {
             const elementsData = elementsDataRef.current;
             for (let i = 0; i < elementsData.length; i++) {
                 for (let j = i + 1; j < elementsData.length; j++) {
@@ -176,7 +229,7 @@ const HeroSection = () => {
             }
         }
 
-        function animate(currentTime) {
+        function animate(currentTime: number): void {
             if (currentTime - lastTime >= frameTime) {
                 updatePositions();
                 checkCollisions();
@@ -185,7 +238,7 @@ const HeroSection = () => {
             animationRef.current = requestAnimationFrame(animate);
         }
 
-        function updateMouseEffects() {
+        function updateMouseEffects(): void {
             if (!mouseRef.current.isMoving) return;
 
             elementsDataRef.current.forEach(data => {
@@ -217,12 +270,12 @@ const HeroSection = () => {
                     data.element.style.transition = 'filter 0.15s ease-out, transform 0.15s ease-out';
                 }
             });
-
             mouseRef.current.isMoving = false;
         }
 
         // Event handlers
-        function handleMouseMove(e) {
+        function handleMouseMove(e: MouseEvent): void {
+            if (!heroSection) return; // Add null check here
             const rect = heroSection.getBoundingClientRect();
             mouseRef.current.x = ((e.clientX - rect.left) / rect.width) * 100;
             mouseRef.current.y = ((e.clientY - rect.top) / rect.height) * 100;
@@ -230,7 +283,7 @@ const HeroSection = () => {
             requestAnimationFrame(updateMouseEffects);
         }
 
-        function handleMouseLeave() {
+        function handleMouseLeave(): void {
             elementsDataRef.current.forEach(data => {
                 data.element.style.filter = '';
                 data.element.style.transform = '';
@@ -295,27 +348,20 @@ const HeroSection = () => {
                 ))}
             </div>
 
-            <div className="relative z-10 text-center px-4 sm:px-6 lg:px-8 max-w-6xl mx-auto">
+            <div className="relative z-10 text-center px-2 sm:px-4 lg:px-6 max-w-5xl mx-auto">
                 {/* Main Title */}
-                <div className="mb-16 text-center">
-                    <h1 className="text-6xl sm:text-7xl lg:text-8xl font-black text-white mb-8 tracking-tight">
-                        <span className="font-extralight text-gray-300">ANDRES</span>
-                        <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                            RAVELO
-                        </span>
+                <div className="mb-8 text-center">
+                    <h1 className="text-5xl sm:text-7xl md:text-8xl lg:text-9xl font-black text-white mb-6 tracking-tight">
+                        <div className="flex flex-col items-center justify-center gap-1 sm:gap-0 sm:block">
+                            <span className="font-extralight text-gray-300 block sm:inline">ANDRES</span>
+                            <span className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent block sm:inline sm:ml-4">
+                                RAVELO
+                            </span>
+                        </div>
                     </h1>
 
                     {/* Interactive Role Buttons */}
-                    <div className="flex flex-wrap justify-center gap-6 text-lg sm:text-xl font-medium mb-12">
-                        {/* <NavigationButton href="/music" variant="hero">
-                            <div className="w-10 h-10 mr-4 rounded-full border border-gray-500 group-hover:border-white flex items-center justify-center transition-all duration-300">
-                                <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M18 3a1 1 0 00-1.196-.98l-10 2A1 1 0 006 5v9.114A4.369 4.369 0 005 14c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V7.82l8-1.6v5.894A4.369 4.369 0 0015 12c-1.657 0-3 .895-3 2s1.343 2 3 2 3-.895 3-2V3z"/>
-                                </svg>
-                            </div>
-                            <span className="text-gray-300 group-hover:text-white transition-colors duration-300">Music</span>
-                        </NavigationButton> */}
-
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 text-lg sm:text-xl font-medium mb-6">
                         <NavigationButton href="/dev/" variant="hero">
                             <div className="w-10 h-10 mr-4 rounded-full border border-gray-500 group-hover:border-white flex items-center justify-center transition-all duration-300">
                                 <svg className="w-5 h-5 text-gray-400 group-hover:text-white transition-colors duration-300" fill="currentColor" viewBox="0 0 20 20">
