@@ -38,15 +38,15 @@ try {
 
 const aboutContent = await getCollection(
     "photography",
-    (entry) => entry.data.type === "about",
+    (entry: { data: { type: string; }; }) => entry.data.type === "about",
 );
 const cameraContent = await getCollection(
     "photography",
-    (entry) => entry.data.type === "camera",
+    (entry: { data: { type: string; }; }) => entry.data.type === "camera",
 );
 const lensContent = await getCollection(
     "photography",
-    (entry) => entry.data.type === "lens",
+    (entry: { data: { type: string; }; }) => entry.data.type === "lens",
 );
 
 const about = aboutContent[0];
@@ -92,7 +92,7 @@ const style = `
                 </h2>
                 <ul class="text-gray-300 text-lg space-y-3">
                     {
-                        cameras.data.details!.map((camera) => (
+                        cameras.data.details!.map((camera: unknown) => (
                             <li class="flex items-center gap-2">
                                 <span class="text-xl">📷</span>
                                 <span>{camera}</span>
@@ -111,7 +111,7 @@ const style = `
                 </h2>
                 <ul class="text-gray-300 text-lg space-y-3">
                     {
-                        lenses.data.details!.map((lens) => (
+                        lenses.data.details!.map((lens: unknown) => (
                             <li class="flex items-center gap-2">
                                 <span class="text-xl">🔭</span>
                                 <span>{lens}</span>

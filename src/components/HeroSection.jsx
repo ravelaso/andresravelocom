@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import NavigationButton from './NavigationButton';
+import NavigationButton from '@/components/NavigationButton';
 
 const HeroSection = () => {
     const heroRef = useRef(null);

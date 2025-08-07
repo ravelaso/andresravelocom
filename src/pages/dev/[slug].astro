@@ -9,8 +9,8 @@ type DevEntry = CollectionEntry<"dev">;
 
 export async function getStaticPaths() {
   const devEntries = await getCollection("dev");
-  const projects = devEntries.filter((entry) => entry.data.type === "project");
-  return projects.map((project) => ({
+  const projects = devEntries.filter((entry: { data: { type: string; }; }) => entry.data.type === "project");
+  return projects.map((project: { slug: any; }) => ({
     params: { slug: project.slug },
     props: { project },
   }));

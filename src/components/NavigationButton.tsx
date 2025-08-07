@@ -18,7 +18,7 @@ const NavigationButton: React.FC<NavigationButtonProps> = ({
                                                                className = '',
                                                                variant = 'default'
                                                            }) => {
-    const baseClasses = "group flex items-center px-6 py-3 rounded-lg border-2 transition-all duration-300";
+    const baseClasses = "bg-neutral-950 group flex items-center px-6 py-3 rounded-lg border-2 transition-all duration-300";
 
     const variantClasses = {
         default: isActive

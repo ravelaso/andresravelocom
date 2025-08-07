@@ -5,7 +5,7 @@ import NavBar from '@/components/NavBar.tsx';
 
 export async function getStaticPaths() {
     const musicProjects = await getCollection('music');
-    return musicProjects.map((project) => ({
+    return musicProjects.map((project: { slug: any; }) => ({
         params: { slug: project.slug },
         props: { project },
     }));
