@@ -11,7 +11,6 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   adapter: cloudflare({
     imageService: 'cloudflare-binding',
-    prerenderEnvironment:'node',
   }),
   integrations: [react()],
 
