@@ -1,4 +1,5 @@
 import type { APIRoute } from 'astro';
+import { env } from "cloudflare:workers";
 
 interface PhotoObject {
     key: string;
@@ -7,10 +8,9 @@ interface PhotoObject {
     lastModified: Date;
 }
 
-export const GET: APIRoute = async ({ url, locals }) => {
+export const GET: APIRoute = async ({ url }) => {
     try {
-        const runtime = locals.runtime;
-        const bucket = runtime.env.PHOTOGRAPHY;
+        const bucket = env.PHOTOGRAPHY;
 
         if (!bucket) {
             return new Response(JSON.stringify({ error: 'R2 bucket not configured' }), {

@@ -1,6 +1,6 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import NavBar from "@/components/NavBar.tsx";
+import NavBar from "@/components/NavBar";
 import DevCard from "@/components/DevCard.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
@@ -49,7 +49,7 @@ const cloud = aboutEntry?.data.cloud ?? [];
 ---
 
 <Layout>
-  <NavBar client:load />
+  <NavBar client:only="react" />
 
   <!-- About + Skills Combined -->
   <section
