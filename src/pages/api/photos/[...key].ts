@@ -1,8 +1,8 @@
 import type { APIRoute } from 'astro';
+import { env } from "cloudflare:workers";
 
-export const GET: APIRoute = async ({ params, locals }) => {
-    const runtime = locals.runtime;
-    const bucket = runtime.env.PHOTOGRAPHY;
+export const GET: APIRoute = async ({ params }) => {
+    const bucket = env.PHOTOGRAPHY;
 
     if (!params.key) {
         return new Response('Image key is required', { status: 400 });

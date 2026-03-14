@@ -1,32 +1,27 @@
 ---
-import { getCollection, type CollectionEntry } from "astro:content";
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/NavBar";
 import { Image } from "astro:assets";
+import { getCollection, render, type CollectionEntry } from "astro:content";
 
-type DevEntry = CollectionEntry<"dev">;
+
+export const prerender = true;
 
 export async function getStaticPaths() {
-  const devEntries = await getCollection("dev");
-  const projects = devEntries.filter(
-    (entry: { data: { type: string } }) => entry.data.type === "project",
-  );
-  return projects.map((project: { slug: any }) => ({
-    params: { slug: project.slug },
+  const projects = await getCollection("dev", ({ data }) => data.type === "project");
+
+  return projects.map((project) => ({
+    params: { slug: project.id },
     props: { project },
   }));
 }
 
-type Props = {
-  project: DevEntry & { data: { type: "project"; date: Date } };
-};
-
 const { project } = Astro.props;
-const { Content } = await project.render();
+const { Content } = await render(project);
 ---
 
 <Layout>
-  <NavBar client:load />
+  <NavBar client:only="react" />
 
   <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100">
     <div class="mb-6">
@@ -74,21 +69,26 @@ const { Content } = await project.render();
           </div>
         )
       }
-      <div class="flex mt-auto pt-8">
-        <a
-          href={project.data.url}
-          class="text-sm px-4 py-2 bg-neutral-100 text-black rounded hover:bg-neutral-200 transition"
-        >
-          See Project
-        </a>
-      </div>
+
+      {
+        project.data.url && (
+          <div class="flex mt-auto pt-8">
+            <a
+              href={project.data.url}
+              class="text-sm px-4 py-2 bg-neutral-100 text-black rounded hover:bg-neutral-200 transition"
+            >
+              See Project
+            </a>
+          </div>
+        )
+      }
     </header>
 
     {
       project.data.coverImage && (
         <div class="mb-12 rounded-lg overflow-hidden border border-neutral-800">
           <div class="flex overflow-x-auto space-x-4 p-4 bg-neutral-900 rounded-lg">
-            {project.data.coverImage.map((image, index) => (
+            {project.data.coverImage.map((image) => (
               <div class="flex-none w-64 h-64 md:w-96 md:h-96">
                 <Image
                   src={image}

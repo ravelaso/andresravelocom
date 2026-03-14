@@ -3,14 +3,11 @@
  * https://developers.cloudflare.com/workers/wrangler/configuration/
  */
 {
-	"$schema": "node_modules/wrangler/config-schema.json",
+	// "$schema": "node_modules/wrangler/config-schema.json",
 	"name": "andresravelocom",
-	"main": "./dist/_worker.js/index.js",
-	"compatibility_date": "2025-08-06",
-	"compatibility_flags": [
-		"nodejs_compat",
-		"global_fetch_strictly_public"
-	],
+	"main": "@astrojs/cloudflare/entrypoints/server",
+	"compatibility_date": "2026-03-13",
+	"compatibility_flags": ["nodejs_compat"],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": "./dist"
@@ -19,8 +16,11 @@
 		"enabled": true
 	},
     "r2_buckets": [
-      { "binding": "PHOTOGRAPHY", "bucket_name": "photography", "experimental_remote": true}
-    ]
+      { "binding": "PHOTOGRAPHY", "bucket_name": "photography",
+		  "remote": true
+	  }
+	]
+
 	/**
 	 * Smart Placement
 	 * Docs: https://developers.cloudflare.com/workers/configuration/smart-placement/#smart-placement

@@ -1,7 +1,7 @@
 ---
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/NavBar";
-import PhotoGallery from "@/components/PhotoGallery.tsx";
+import PhotoGallery from "@/components/PhotoGallery";
 
 import { getCollection } from "astro:content";
 
@@ -61,7 +61,7 @@ const style = `
 ---
 
 <Layout>
-    <NavBar client:load />
+    <NavBar client:only="react" />
 
     <!-- Page Heading -->
     <section
@@ -131,5 +131,5 @@ const style = `
     </h2>
 
     <!-- Gallery Component -->
-    <PhotoGallery client:load initialData={initialData} />
+    <PhotoGallery client:only="react" initialData={initialData} />
 </Layout>

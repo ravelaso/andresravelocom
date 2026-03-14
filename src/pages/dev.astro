@@ -1,55 +1,38 @@
 ---
 import Layout from "@/layouts/Layout.astro";
-import NavBar from "@/components/NavBar.tsx";
+import NavBar from "@/components/NavBar";
 import DevCard from "@/components/DevCard.astro";
 import { getCollection, type CollectionEntry } from "astro:content";
 
 export const prerender = true;
 
-// Base type
 type DevEntry = CollectionEntry<"dev">;
+type ProjectEntry = Extract<DevEntry, { data: { type: "project" } }>;
+type AboutEntry = Extract<DevEntry, { data: { type: "about" } }>;
 
-// Type guards
-function isProject(
-  entry: DevEntry,
-): entry is DevEntry & { data: { type: "project"; date: Date } } {
+function isProject(entry: DevEntry): entry is ProjectEntry {
   return entry.data.type === "project";
 }
 
-function isAbout(entry: DevEntry): entry is DevEntry & {
-  data: {
-    type: "about";
-    frontend?: string[];
-    backend?: string[];
-    cloud?: string[];
-  };
-} {
+function isAbout(entry: DevEntry): entry is AboutEntry {
   return entry.data.type === "about";
 }
 
-// Get entries
 const devEntries = await getCollection("dev");
-
-// Narrow entries
 const aboutEntry = devEntries.find(isAbout);
 const projects = devEntries.filter(isProject);
 
-// Sort projects
 const sortedProjects = projects.sort(
-  (
-    a: { data: { date: string | number | Date } },
-    b: { data: { date: string | number | Date } },
-  ) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
 );
 
-// Access skills safely
 const frontend = aboutEntry?.data.frontend ?? [];
 const backend = aboutEntry?.data.backend ?? [];
 const cloud = aboutEntry?.data.cloud ?? [];
 ---
 
 <Layout>
-  <NavBar client:load />
+  <NavBar client:only="react" />
 
   <!-- About + Skills Combined -->
   <section
@@ -72,7 +55,7 @@ const cloud = aboutEntry?.data.cloud ?? [];
         <h3 class="text-lg font-semibold text-neutral-100 mb-2">Frontend</h3>
         <ul class="flex flex-wrap gap-2">
           {
-            frontend.map((tech: unknown) => (
+            frontend.map((tech) => (
               <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
                 {tech}
               </li>
@@ -85,7 +68,7 @@ const cloud = aboutEntry?.data.cloud ?? [];
         <h3 class="text-lg font-semibold text-neutral-100 mb-2">Backend</h3>
         <ul class="flex flex-wrap gap-2">
           {
-            backend.map((tech: unknown) => (
+            backend.map((tech) => (
               <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
                 {tech}
               </li>
@@ -100,7 +83,7 @@ const cloud = aboutEntry?.data.cloud ?? [];
         </h3>
         <ul class="flex flex-wrap gap-2">
           {
-            cloud.map((tech: unknown) => (
+            cloud.map((tech) => (
               <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
                 {tech}
               </li>
@@ -111,23 +94,9 @@ const cloud = aboutEntry?.data.cloud ?? [];
     </div>
   </section>
 
-  <!-- Projects List -->
   <section
     class="bg-neutral-950 p-10 m-10 max-w-5xl mx-auto px-4 grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pb-32"
   >
-    {
-      sortedProjects.map(
-        (project: {
-          slug: string;
-          data: {
-            title: string;
-            description?: string;
-            date: Date;
-            url?: string;
-            tech?: string[];
-          };
-        }) => <DevCard project={project} />,
-      )
-    }
+    {sortedProjects.map((project) => <DevCard project={project} />)}
   </section>
 </Layout>
