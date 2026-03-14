@@ -41,11 +41,14 @@ export const GET: APIRoute = async ({ url }) => {
             });
         }
 
-        // Filter for image files
+        // Filter for image files and sort newest first
         const images: PhotoObject[] = listResult.objects
             .filter((obj: any) => {
                 const ext = obj.key.toLowerCase().split('.').pop();
                 return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext || '');
+            })
+            .sort((a: any, b: any) => {
+                return new Date(b.uploaded).getTime() - new Date(a.uploaded).getTime();
             })
             .map((obj: any) => ({
                 key: obj.key,

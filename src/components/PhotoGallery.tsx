@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface PhotoObject {
@@ -23,6 +22,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
     const [hasMore, setHasMore] = useState(initialData.hasMore);
     const [nextCursor, setNextCursor] = useState<string | null>(initialData.cursor);
     const [isLoading, setIsLoading] = useState(false);
+    const [didTryInitialFetch, setDidTryInitialFetch] = useState(false);
     const [modalImage, setModalImage] = useState<string | null>(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [columns, setColumns] = useState(4);
@@ -58,6 +58,34 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
         return columnArrays;
     }, [columns]);
 
+    const loadInitialImages = useCallback(async () => {
+        if (isLoading) return;
+
+        setIsLoading(true);
+
+        try {
+            const response = await fetch('/api/photos?limit=12');
+
+            if (!response.ok) {
+                throw new Error(`Failed to load initial images: ${response.status}`);
+            }
+
+            const data: ApiResponse = await response.json();
+
+            setImages(data.images ?? []);
+            setHasMore(data.hasMore ?? false);
+            setNextCursor(data.cursor ?? null);
+        } catch (error) {
+            console.error('Error loading initial images:', error);
+            setImages([]);
+            setHasMore(false);
+            setNextCursor(null);
+        } finally {
+            setDidTryInitialFetch(true);
+            setIsLoading(false);
+        }
+    }, [isLoading]);
+
     const loadMoreImages = useCallback(async () => {
         if (isLoading || !hasMore || !nextCursor) return;
 
@@ -66,6 +94,11 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
         try {
             const url = `/api/photos?limit=12&cursor=${encodeURIComponent(nextCursor)}`;
             const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(`Failed to load more images: ${response.status}`);
+            }
+
             const data: ApiResponse = await response.json();
 
             if (data.images && data.images.length > 0) {
@@ -74,6 +107,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
                 setNextCursor(data.cursor);
             } else {
                 setHasMore(false);
+                setNextCursor(null);
             }
         } catch (error) {
             console.error('Error loading more images:', error);
@@ -82,6 +116,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
             setIsLoading(false);
         }
     }, [isLoading, hasMore, nextCursor]);
+
+    // Fallback: if server-side initialData is empty, fetch the first page in the browser
+    useEffect(() => {
+        if (images.length === 0 && !hasMore && !nextCursor && !didTryInitialFetch) {
+            loadInitialImages();
+        }
+    }, [images.length, hasMore, nextCursor, didTryInitialFetch, loadInitialImages]);
 
     // Setup infinite scroll
     useEffect(() => {
@@ -157,6 +198,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
                 <div className="text-center py-8">
                     <div className="inline-block w-8 h-8 border-4 border-gray-600 border-t-white rounded-full animate-spin"></div>
                     <p className="text-gray-400 mt-2">Loading more images...</p>
+                </div>
+            )}
+
+            {/* Empty state */}
+            {!isLoading && images.length === 0 && didTryInitialFetch && (
+                <div className="text-center py-8 text-gray-500">
+                    <p>No images found.</p>
                 </div>
             )}
 
