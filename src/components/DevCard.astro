@@ -1,7 +1,7 @@
 ---
 export interface Props {
   project: {
-    slug: string;
+    id: string;
     data: {
       title: string;
       description?: string;
@@ -39,7 +39,7 @@ const { title, description, date, url, tech } = project.data;
   </div>
   <div class="flex gap-2 mt-auto pt-4">
     <a
-      href={`/dev/${project.slug}`}
+      href={`/dev/${project.id}`}
       class="text-sm px-4 py-2 bg-neutral-100 text-black rounded hover:bg-neutral-200 transition"
     >
       Read More

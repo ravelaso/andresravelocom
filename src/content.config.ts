@@ -23,27 +23,28 @@ const musicCollection = defineCollection({
 
 const devCollection = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/dev' }),
-  schema: z.discriminatedUnion('type', [
-    z.object({
-      type: z.literal('project'),
-      title: z.string(),
-      description: z.string(),
-      date: z.coerce.date(),
-      tags: z.array(z.string()).optional(),
-      url: z.string().optional(),
-      tech: z.array(z.string()).optional(),
-      category: z.enum(['web', 'mobile', 'desktop', 'library', 'tool']).optional(),
-      coverImage: z.array(z.string()).optional(),
-    }),
-    z.object({
-      type: z.literal('about'),
-      title: z.string(),
-      description: z.string().optional(),
-      frontend: z.array(z.string()).optional(),
-      backend: z.array(z.string()).optional(),
-      cloud: z.array(z.string()).optional(),
-    }),
-  ]),
+  schema: ({ image }) =>
+    z.discriminatedUnion('type', [
+      z.object({
+        type: z.literal('project'),
+        title: z.string(),
+        description: z.string(),
+        date: z.coerce.date(),
+        tags: z.array(z.string()).optional(),
+        url: z.string().optional(),
+        tech: z.array(z.string()).optional(),
+        category: z.enum(['web', 'mobile', 'desktop', 'library', 'tool']).optional(),
+        coverImage: z.array(image()).optional(),
+      }),
+      z.object({
+        type: z.literal('about'),
+        title: z.string(),
+        description: z.string().optional(),
+        frontend: z.array(z.string()).optional(),
+        backend: z.array(z.string()).optional(),
+        cloud: z.array(z.string()).optional(),
+      }),
+    ]),
 });
 
 const photographyCollection = defineCollection({

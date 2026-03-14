@@ -7,6 +7,7 @@ frontend:
   - React Native
   - Astro
   - Tailwind CSS
+  - Flutter
 backend:
   - Node.js
   - .NET (C#)

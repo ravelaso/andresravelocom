@@ -3,9 +3,9 @@ type: project
 title: "Expose Film"
 description: "Your Film Photography companion for iOS / Android App"
 date: 2025-08-09
-tags: ["reactnative", "ios", "android"]
+tags: ["flutter", "ios", "android"]
 url: "https://github.com/ravelaso/expose-film"
-tech: ["ReactNative", "iOS", "Android", "Expo"]
+tech: ["Flutter", "iOS", "Android"]
 category: "mobile"
 coverImage: ["@/assets/homepage.jpg", "@/assets/rollspage.jpg"]
 ---
@@ -23,3 +23,4 @@ You can have film rolls set up and track each frame you meter with the app to ha
 of exposures through your rolls. You can always come back and check which camera settings you chose
 for the camera.
 
+More to be added soon!
