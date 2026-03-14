@@ -4,14 +4,11 @@ import NavBar from "@/components/NavBar";
 import { Image } from "astro:assets";
 import { getCollection, render, type CollectionEntry } from "astro:content";
 
-type DevEntry = CollectionEntry<"dev">;
-type ProjectEntry = Extract<DevEntry, { data: { type: "project" } }>;
+
+export const prerender = true;
 
 export async function getStaticPaths() {
-  const devEntries = await getCollection("dev");
-  const projects = devEntries.filter(
-    (entry): entry is ProjectEntry => entry.data.type === "project",
-  );
+  const projects = await getCollection("dev", ({ data }) => data.type === "project");
 
   return projects.map((project) => ({
     params: { slug: project.id },
@@ -19,7 +16,7 @@ export async function getStaticPaths() {
   }));
 }
 
-const { project } = Astro.props as { project: ProjectEntry };
+const { project } = Astro.props;
 const { Content } = await render(project);
 ---
 
