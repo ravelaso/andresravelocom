@@ -11,10 +11,9 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   output: "server",
   adapter: cloudflare({
-    imageService: {build: "compile", runtime: "passthrough"},
+    imageService: "compile",
   }),
   integrations: [react()],
-
   vite: {
       resolve: {
           // Use react-dom/server.edge instead of react-dom/server.browser for React 19.
