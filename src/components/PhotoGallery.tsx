@@ -11,6 +11,7 @@ interface ApiResponse {
     images: PhotoObject[];
     hasMore: boolean;
     cursor: string | null;
+    total?: number;
 }
 
 interface PhotoGalleryProps {
@@ -20,9 +21,10 @@ interface PhotoGalleryProps {
 const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
     const [images, setImages] = useState<PhotoObject[]>(initialData.images);
     const [hasMore, setHasMore] = useState(initialData.hasMore);
-    const [nextCursor, setNextCursor] = useState<string | null>(initialData.cursor);
+    const [nextOffset, setNextOffset] = useState<number>(initialData.images.length);
     const [isLoading, setIsLoading] = useState(false);
     const [didTryInitialFetch, setDidTryInitialFetch] = useState(false);
+    const [totalPhotos, setTotalPhotos] = useState<number>(initialData.total || 0);
     const [modalImage, setModalImage] = useState<string | null>(null);
     const [modalLoading, setModalLoading] = useState(false);
     const [columns, setColumns] = useState(4);
@@ -64,7 +66,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
         setIsLoading(true);
 
         try {
-            const response = await fetch('/api/photos?limit=12');
+            const response = await fetch('/api/photos?limit=12&offset=0');
 
             if (!response.ok) {
                 throw new Error(`Failed to load initial images: ${response.status}`);
@@ -74,12 +76,14 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
 
             setImages(data.images ?? []);
             setHasMore(data.hasMore ?? false);
-            setNextCursor(data.cursor ?? null);
+            setNextOffset((data.images ?? []).length);
+            setTotalPhotos(data.total ?? 0);
         } catch (error) {
             console.error('Error loading initial images:', error);
             setImages([]);
             setHasMore(false);
-            setNextCursor(null);
+            setNextOffset(0);
+            setTotalPhotos(0);
         } finally {
             setDidTryInitialFetch(true);
             setIsLoading(false);
@@ -87,12 +91,12 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
     }, [isLoading]);
 
     const loadMoreImages = useCallback(async () => {
-        if (isLoading || !hasMore || !nextCursor) return;
+        if (isLoading || !hasMore) return;
 
         setIsLoading(true);
 
         try {
-            const url = `/api/photos?limit=12&cursor=${encodeURIComponent(nextCursor)}`;
+            const url = `/api/photos?limit=12&offset=${nextOffset}`;
             const response = await fetch(url);
 
             if (!response.ok) {
@@ -104,10 +108,10 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
             if (data.images && data.images.length > 0) {
                 setImages(prev => [...prev, ...data.images]);
                 setHasMore(data.hasMore);
-                setNextCursor(data.cursor);
+                setNextOffset(prev => prev + data.images.length);
+                setTotalPhotos(data.total ?? totalPhotos);
             } else {
                 setHasMore(false);
-                setNextCursor(null);
             }
         } catch (error) {
             console.error('Error loading more images:', error);
@@ -115,14 +119,14 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
         } finally {
             setIsLoading(false);
         }
-    }, [isLoading, hasMore, nextCursor]);
+    }, [isLoading, hasMore, nextOffset, totalPhotos]);
 
     // Fallback: if server-side initialData is empty, fetch the first page in the browser
     useEffect(() => {
-        if (images.length === 0 && !hasMore && !nextCursor && !didTryInitialFetch) {
+        if (images.length === 0 && !hasMore && !didTryInitialFetch) {
             loadInitialImages();
         }
-    }, [images.length, hasMore, nextCursor, didTryInitialFetch, loadInitialImages]);
+    }, [images.length, hasMore, didTryInitialFetch, loadInitialImages]);
 
     // Setup infinite scroll
     useEffect(() => {
@@ -175,6 +179,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
 
     return (
         <>
+            {/* Gallery Stats */}
+            {/*{totalPhotos > 0 && (*/}
+            {/*    <div className="text-center text-gray-400 text-sm mb-4">*/}
+            {/*        Showing {images.length} of {totalPhotos} photos (newest first)*/}
+            {/*    </div>*/}
+            {/*)}*/}
+
             {/* Gallery Grid - Flexbox Masonry */}
             <div ref={galleryRef} className="flex gap-3 p-5">
                 {imageColumns.map((columnImages, columnIndex) => (
