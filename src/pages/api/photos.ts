@@ -1,7 +1,7 @@
-
 import type { APIRoute } from 'astro';
 import { env } from "cloudflare:workers";
-import { getCollection } from 'astro:content';
+import type { PhotoMeta } from '@/types/photo';
+import rawPhotosData from '@/data/photos.json';
 
 interface PhotoObject {
     key: string;
@@ -73,27 +73,8 @@ export const GET: APIRoute = async ({ url }) => {
             console.log(`Cached ${allPhotos.length} photos, newest first`);
         }
 
-        const metadataMap = new Map<string, Record<string, any>>();
-        try {
-            const photosCollection = await getCollection('photos');
-            for (const entry of photosCollection) {
-                const data = entry.data as Record<string, any>;
-                metadataMap.set(entry.id, {
-                    title: data.title,
-                    description: data.description,
-                    tags: data.tags ?? [],
-                    camera: data.camera,
-                    lens: data.lens,
-                    film: data.film,
-                    date: data.date ? new Date(data.date).toISOString() : undefined,
-                    location: data.location,
-                    featured: data.featured ?? false,
-                    forSale: data.forSale ?? false,
-                });
-            }
-        } catch {
-            console.warn('No photo metadata available, returning raw R2 data');
-        }
+        const allMeta = rawPhotosData as Record<string, PhotoMeta>;
+        const metadataMap = new Map<string, PhotoMeta>(Object.entries(allMeta));
 
         const totalPhotos = cachedPhotos.length;
         const startIndex = offset;

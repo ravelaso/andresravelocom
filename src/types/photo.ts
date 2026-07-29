@@ -7,7 +7,7 @@ export const PhotoMetaSchema = z.object({
   camera: z.string().optional(),
   lens: z.string().optional(),
   film: z.string().optional(),
-  date: z.coerce.date().optional(),
+  date: z.string().optional(),
   location: z.string().optional(),
   featured: z.boolean().default(false),
   forSale: z.boolean().default(false),
