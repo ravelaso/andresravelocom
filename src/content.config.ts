@@ -1,6 +1,6 @@
 import { defineCollection } from 'astro:content';
 import { z } from 'astro/zod';
-import { glob } from 'astro/loaders';
+import { glob, file } from 'astro/loaders';
 
 const musicCollection = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/music' }),
@@ -68,8 +68,36 @@ const photographyCollection = defineCollection({
   ]),
 });
 
+const photosCollection = defineCollection({
+  loader: file('src/data/photos.json'),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    camera: z.string().optional(),
+    lens: z.string().optional(),
+    film: z.string().optional(),
+    date: z.coerce.date().optional(),
+    location: z.string().optional(),
+    featured: z.boolean().default(false),
+    forSale: z.boolean().default(false),
+  }),
+});
+
+const collectionsCollection = defineCollection({
+  loader: file('src/data/collections.json'),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    coverPhoto: z.string().optional(),
+    photos: z.array(z.string()).default([]),
+  }),
+});
+
 export const collections = {
   music: musicCollection,
   dev: devCollection,
   photography: photographyCollection,
+  photos: photosCollection,
+  collections: collectionsCollection,
 };

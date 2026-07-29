@@ -1,6 +1,7 @@
 
 import type { APIRoute } from 'astro';
 import { env } from "cloudflare:workers";
+import { getCollection } from 'astro:content';
 
 interface PhotoObject {
     key: string;
@@ -29,18 +30,16 @@ export const GET: APIRoute = async ({ url }) => {
         const limit = parseInt(searchParams.get('limit') || '20');
         const offset = parseInt(searchParams.get('offset') || '0');
 
-        // Check if we have cached photos that are still fresh
         const now = Date.now();
         if (!cachedPhotos || (now - cacheTimestamp) > CACHE_DURATION) {
             console.log('Fetching all photos from R2...');
 
-            // Fetch ALL objects from the bucket
             const allPhotos: PhotoObject[] = [];
             let cursor: string | undefined;
 
             do {
                 const listResult = await bucket.list({
-                    limit: 1000, // Max per request
+                    limit: 1000,
                     cursor,
                     include: ['httpMetadata']
                 });
@@ -64,19 +63,38 @@ export const GET: APIRoute = async ({ url }) => {
                 cursor = listResult.truncated ? listResult.cursor : undefined;
             } while (cursor);
 
-            // Sort ALL photos by date descending (newest first)
             allPhotos.sort((a, b) => {
                 return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
             });
 
-            // Cache the sorted results
             cachedPhotos = allPhotos;
             cacheTimestamp = now;
 
             console.log(`Cached ${allPhotos.length} photos, newest first`);
         }
 
-        // Handle pagination from the sorted cache
+        const metadataMap = new Map<string, Record<string, any>>();
+        try {
+            const photosCollection = await getCollection('photos');
+            for (const entry of photosCollection) {
+                const data = entry.data as Record<string, any>;
+                metadataMap.set(entry.id, {
+                    title: data.title,
+                    description: data.description,
+                    tags: data.tags ?? [],
+                    camera: data.camera,
+                    lens: data.lens,
+                    film: data.film,
+                    date: data.date ? new Date(data.date).toISOString() : undefined,
+                    location: data.location,
+                    featured: data.featured ?? false,
+                    forSale: data.forSale ?? false,
+                });
+            }
+        } catch {
+            console.warn('No photo metadata available, returning raw R2 data');
+        }
+
         const totalPhotos = cachedPhotos.length;
         const startIndex = offset;
         const endIndex = Math.min(startIndex + limit, totalPhotos);
@@ -84,15 +102,32 @@ export const GET: APIRoute = async ({ url }) => {
         const paginatedPhotos = cachedPhotos.slice(startIndex, endIndex);
         const hasMore = endIndex < totalPhotos;
 
+        const enrichedImages = paginatedPhotos.map((photo) => {
+            const meta = metadataMap.get(photo.key);
+            return {
+                ...photo,
+                title: meta?.title ?? photo.key,
+                description: meta?.description,
+                tags: meta?.tags ?? [],
+                camera: meta?.camera,
+                lens: meta?.lens,
+                film: meta?.film,
+                date: meta?.date,
+                location: meta?.location,
+                featured: meta?.featured ?? false,
+                forSale: meta?.forSale ?? false,
+            };
+        });
+
         return new Response(JSON.stringify({
-            images: paginatedPhotos,
+            images: enrichedImages,
             hasMore,
             cursor: hasMore ? (offset + limit).toString() : null,
             total: totalPhotos
         }), {
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'public, max-age=300' // 5 minutes
+                'Cache-Control': 'public, max-age=300'
             }
         });
 

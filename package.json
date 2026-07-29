@@ -8,16 +8,17 @@
 		"preview": "astro build && wrangler",
 		"astro": "astro",
 		"deploy": "astro build && wrangler deploy",
+    "photos:sync": "tsx scripts/photos-sync.ts",
 		"cf-typegen": "wrangler types"
 	},
 	"dependencies": {
-		"@astrojs/check": "^0.9.7",
-		"@astrojs/cloudflare": "^13.1.1",
-		"@astrojs/react": "^5.0.0",
+		"@astrojs/check": "^0.9.10",
+		"@astrojs/cloudflare": "^14.1.6",
+		"@astrojs/react": "^6.0.2",
 		"@tailwindcss/vite": "^4.1.11",
 		"@types/react": "^19.1.9",
 		"@types/react-dom": "^19.1.7",
-		"astro": "^6.0.4",
+		"astro": "^7.1.5",
 		"react": "^19.1.1",
 		"react-dom": "^19.1.1",
 		"tailwindcss": "^4.1.11",
@@ -26,6 +27,7 @@
 	"devDependencies": {
 		"@tailwindcss/typography": "^0.5.16",
 		"@types/node": "^24.2.0",
+		"tsx": "^4.23.1",
 		"wrangler": "^4.28.0"
 	}
 }
