@@ -5,6 +5,7 @@ import PhotoEditor from './PhotoEditor';
 import UploadZone from './UploadZone';
 import CollectionManager from './CollectionManager';
 import CollectionEditor from './CollectionEditor';
+import BatchEditor from './BatchEditor';
 import NotificationToast, { useToast } from './NotificationToast';
 
 interface PhotoMeta {
@@ -86,6 +87,8 @@ export default function AdminApp() {
   const [editingCollection, setEditingCollection] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'featured' | 'untagged'>('all');
   const [activeCollection, setActiveCollection] = useState<string | null>(null);
+  const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
+  const [batchEditorOpen, setBatchEditorOpen] = useState(false);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -121,7 +124,7 @@ export default function AdminApp() {
     if (needMeta.length > 0) {
       for (const p of needMeta) {
         existingMeta[p.key] = {
-          title: keyToTitle(p.key),
+          title: '',
           tags: [],
           featured: false,
           forSale: false,
@@ -250,6 +253,92 @@ export default function AdminApp() {
     addToast(ok ? 'success' : 'error', ok ? `${list} saved` : `Failed to save ${list}`);
   };
 
+  const handleToggleSelect = (key: string) => {
+    setSelectedKeys((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key);
+      else next.add(key);
+      return next;
+    });
+  };
+
+  const handleClearSelection = () => setSelectedKeys(new Set());
+
+  const handleBatchApply = async (data: Partial<PhotoMeta>) => {
+    const updated = photos.map((p) =>
+      selectedKeys.has(p.key) ? { ...p, meta: { ...p.meta, ...data } as PhotoMeta } : p
+    );
+    setPhotos(updated);
+    const ok = await writeDataFile('photos.json', buildMetaMap(updated));
+    addToast(ok ? 'success' : 'error', ok ? 'Batch update applied' : 'Failed to apply batch update');
+    setSelectedKeys(new Set());
+    setBatchEditorOpen(false);
+  };
+
+  const handleBatchDelete = async () => {
+    const count = selectedKeys.size;
+    if (!window.confirm(`Delete ${count} photo${count !== 1 ? 's' : ''}? This cannot be undone.`)) return;
+
+    const keys = Array.from(selectedKeys);
+    const results = await Promise.allSettled(
+      keys.map((key) =>
+        fetch(`/api/admin/photos/${encodeURIComponent(key)}`, { method: 'DELETE' })
+      )
+    );
+
+    const succeeded: string[] = [];
+    const failed: string[] = [];
+    results.forEach((r, i) => {
+      if (r.status === 'fulfilled' && r.value.ok) succeeded.push(keys[i]);
+      else failed.push(keys[i]);
+    });
+
+    const remaining = photos.filter((p) => !succeeded.includes(p.key));
+    setPhotos(remaining);
+
+    const updatedCollections: Record<string, Collection> = {};
+    for (const slug of Object.keys(collections)) {
+      const c = { ...collections[slug] };
+      c.photos = c.photos.filter((k) => !succeeded.includes(k));
+      updatedCollections[slug] = c;
+    }
+    setCollections(updatedCollections);
+
+    await Promise.all([
+      writeDataFile('photos.json', buildMetaMap(remaining)),
+      writeDataFile('collections.json', updatedCollections),
+    ]);
+
+    setSelectedKeys(new Set());
+    setBatchEditorOpen(false);
+
+    if (failed.length === 0) {
+      addToast('success', `Deleted ${succeeded.length} photo${succeeded.length !== 1 ? 's' : ''}`);
+    } else {
+      addToast('error', `Deleted ${succeeded.length}, failed ${failed.length}`);
+    }
+  };
+
+  const handleDownloadBackup = async () => {
+    try {
+      addToast('info', 'Preparing backup...');
+      const res = await fetch('/api/admin/backup');
+      if (!res.ok) { addToast('error', 'Backup failed'); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `photos-backup-${new Date().toISOString().slice(0, 10)}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      addToast('success', 'Backup downloaded');
+    } catch {
+      addToast('error', 'Backup failed');
+    }
+  };
+
   const availableTags = useMemo(() => {
     const set = new Set<string>();
     for (const p of photos) if (p.meta?.tags) p.meta.tags.forEach((t) => set.add(t));
@@ -272,8 +361,9 @@ export default function AdminApp() {
         onAddCollection={() => setEditingCollection('__new__')}
         onEditCollection={setEditingCollection}
         onDeleteCollection={handleDeleteCollection}
-        onUpload={() => setShowUpload(true)}
-      >
+          onUpload={() => setShowUpload(true)}
+          onDownload={handleDownloadBackup}
+        >
         {loading ? (
           <div className="flex flex-col items-center justify-center h-64 gap-3">
             <div className="w-8 h-8 border-4 border-gray-600 border-t-white rounded-full animate-spin" />
@@ -311,10 +401,40 @@ export default function AdminApp() {
               photos={filteredPhotos}
               collections={collections}
               onSelect={setSelectedPhoto}
+              selectedKeys={selectedKeys}
+              onToggleSelect={handleToggleSelect}
             />
           </>
         )}
       </AdminLayout>
+
+      {selectedKeys.size > 0 && (
+        <div className="fixed bottom-0 left-0 right-0 z-50 bg-neutral-900/95 backdrop-blur border-t border-gray-700 px-6 py-3 flex items-center justify-between">
+          <span className="text-sm text-gray-300">
+            {selectedKeys.size} photo{selectedKeys.size !== 1 ? 's' : ''} selected
+          </span>
+          <div className="flex gap-3">
+            <button
+              onClick={handleClearSelection}
+              className="px-3 py-1.5 text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Clear
+            </button>
+            <button
+              onClick={handleBatchDelete}
+              className="px-4 py-1.5 text-sm bg-red-600 hover:bg-red-500 rounded-lg transition-colors"
+            >
+              Delete Selected
+            </button>
+            <button
+              onClick={() => setBatchEditorOpen(true)}
+              className="px-4 py-1.5 text-sm bg-blue-600 hover:bg-blue-500 rounded-lg transition-colors"
+            >
+              Batch Edit
+            </button>
+          </div>
+        </div>
+      )}
 
       {selectedPhoto && (
         <PhotoEditor
@@ -345,6 +465,18 @@ export default function AdminApp() {
           photos={photos}
           onSave={handleSaveCollection}
           onClose={() => setEditingCollection(null)}
+        />
+      )}
+
+      {batchEditorOpen && (
+        <BatchEditor
+          count={selectedKeys.size}
+          cameras={cameras}
+          lenses={lenses}
+          availableTags={availableTags}
+          onApply={handleBatchApply}
+          onBatchDelete={handleBatchDelete}
+          onClose={() => setBatchEditorOpen(false)}
         />
       )}
 

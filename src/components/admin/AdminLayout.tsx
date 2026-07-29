@@ -18,6 +18,7 @@ interface AdminLayoutProps {
   onEditCollection: (slug: string) => void;
   onDeleteCollection: (slug: string) => void;
   onUpload: () => void;
+  onDownload: () => void;
   children: React.ReactNode;
 }
 
@@ -31,6 +32,7 @@ export default function AdminLayout({
   onEditCollection,
   onDeleteCollection,
   onUpload,
+  onDownload,
   children,
 }: AdminLayoutProps) {
   return (
@@ -38,6 +40,12 @@ export default function AdminLayout({
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
         <h1 className="text-xl font-bold tracking-tight">Photo Admin</h1>
         <div className="flex gap-3">
+          <button
+            onClick={onDownload}
+            className="px-4 py-2 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+          >
+            Download All
+          </button>
           <button
             onClick={onUpload}
             className="px-4 py-2 bg-white text-black rounded-lg font-medium hover:bg-gray-200 transition-colors"

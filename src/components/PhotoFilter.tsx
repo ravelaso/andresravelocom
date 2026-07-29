@@ -59,11 +59,6 @@ function PhotoFilter({
               }`}
             >
               All Photos
-              {!activeFilters.collection && (
-                <span className="text-xs text-gray-500 ml-2">
-                  ({availableCollections.reduce((s, c) => s + c.photoCount, 0)})
-                </span>
-              )}
             </button>
           </li>
           {availableCollections.map((col) => (
