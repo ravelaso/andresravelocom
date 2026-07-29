@@ -6,7 +6,7 @@
       "minolta",
       "leica"
     ],
-    "featured": true,
+    "featured": false,
     "forSale": false,
     "description": "",
     "camera": "Leitz Minolta CL",
@@ -348,7 +348,7 @@
   "18066242081445705.jpg": {
     "title": "18066242081445705",
     "tags": [],
-    "featured": true,
+    "featured": false,
     "forSale": false,
     "description": "",
     "camera": "",
@@ -654,7 +654,7 @@
   "497109071_17856088584426581_1232556145476436775_n_18059938514132603.jpg": {
     "title": "497109071 17856088584426581 1232556145476436775 N 18059938514132603",
     "tags": [],
-    "featured": true,
+    "featured": false,
     "forSale": false,
     "description": "",
     "camera": "",

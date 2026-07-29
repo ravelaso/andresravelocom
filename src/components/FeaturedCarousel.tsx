@@ -11,7 +11,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClic
     <div className="px-5 pt-5">
       <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
         <span className="text-amber-400">★</span>
-        Featured
+        Highlights
       </h2>
       <div
         className="flex gap-3 overflow-x-auto pb-3 scroll-smooth snap-x snap-mandatory scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent"
