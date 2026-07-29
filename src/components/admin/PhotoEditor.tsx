@@ -27,13 +27,28 @@ interface Collection {
 interface PhotoEditorProps {
   photo: AdminPhoto;
   collections: Record<string, Collection>;
+  cameras: { name: string }[];
+  lenses: { name: string }[];
+  availableTags: string[];
   onSave: (key: string, data: Partial<PhotoMeta>) => Promise<void>;
   onDelete: (key: string) => Promise<void>;
   onToggleCollection: (slug: string, add: boolean) => void;
+  onSaveReferenceList: (list: 'cameras' | 'lenses', data: { name: string }[]) => void;
   onClose: () => void;
 }
 
-export default function PhotoEditor({ photo, collections, onSave, onDelete, onToggleCollection, onClose }: PhotoEditorProps) {
+export default function PhotoEditor({
+  photo,
+  collections,
+  cameras,
+  lenses,
+  availableTags,
+  onSave,
+  onDelete,
+  onToggleCollection,
+  onSaveReferenceList,
+  onClose,
+}: PhotoEditorProps) {
   const [form, setForm] = useState<PhotoMeta>({
     title: photo.meta?.title ?? '',
     description: photo.meta?.description ?? '',
@@ -49,13 +64,15 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
   const [tagInput, setTagInput] = useState('');
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [addingCamera, setAddingCamera] = useState(false);
+  const [addingLens, setAddingLens] = useState(false);
 
   const handleChange = (field: keyof PhotoMeta, value: any) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const addTag = () => {
-    const t = tagInput.trim().toLowerCase();
+  const addTag = (tag?: string) => {
+    const t = (tag ?? tagInput).trim().toLowerCase();
     if (t && !form.tags.includes(t)) {
       setForm((prev) => ({ ...prev, tags: [...prev.tags, t] }));
     }
@@ -66,9 +83,43 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
     setForm((prev) => ({ ...prev, tags: prev.tags.filter((t) => t !== tag) }));
   };
 
+  const cameraNames = cameras.map((c) => c.name);
+  const lensNames = lenses.map((l) => l.name);
+
+  const isNewCamera = form.camera && !cameraNames.includes(form.camera);
+  const isNewLens = form.lens && !lensNames.includes(form.lens);
+
+  const handleCameraSelect = (value: string) => {
+    if (value === '__new__') {
+      setAddingCamera(true);
+      if (!form.camera) handleChange('camera', '');
+    } else {
+      setAddingCamera(false);
+      handleChange('camera', value);
+    }
+  };
+
+  const handleLensSelect = (value: string) => {
+    if (value === '__new__') {
+      setAddingLens(true);
+      if (!form.lens) handleChange('lens', '');
+    } else {
+      setAddingLens(false);
+      handleChange('lens', value);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
+      if (isNewCamera && form.camera) {
+        const updated = [...cameras, { name: form.camera }];
+        onSaveReferenceList('cameras', updated);
+      }
+      if (isNewLens && form.lens) {
+        const updated = [...lenses, { name: form.lens }];
+        onSaveReferenceList('lenses', updated);
+      }
       await onSave(photo.key, form);
     } finally {
       setSaving(false);
@@ -91,16 +142,30 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
     onToggleCollection(slug, !isInCollection(slug));
   };
 
+  const tagId = `tag-input-${photo.key}`;
+
   return (
-    <div className="fixed inset-0 z-50 bg-black/70 flex items-start justify-end">
-      <div className="w-full max-w-2xl bg-neutral-900 h-full overflow-y-auto border-l border-gray-800">
-        <div className="sticky top-0 bg-neutral-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
-          <h2 className="font-semibold truncate">{photo.meta?.title || photo.key}</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>
+    <div
+      className="fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4"
+      onClick={onClose}
+    >
+      <div
+        className="flex flex-col md:flex-row max-w-5xl w-full max-h-[90vh] bg-neutral-900 rounded-2xl overflow-hidden shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="w-full md:w-2/5 bg-black flex items-center justify-center min-h-48 md:min-h-0">
+          <img
+            src={photo.url}
+            alt=""
+            className="w-full h-full object-contain max-h-[40vh] md:max-h-none"
+          />
         </div>
 
-        <div className="p-6 space-y-6">
-          <img src={photo.url} alt="" className="w-full rounded-lg" />
+        <div className="w-full md:w-3/5 overflow-y-auto p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-lg truncate">{form.title || photo.key}</h2>
+            <button onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none shrink-0 ml-2">&times;</button>
+          </div>
 
           <Field label="Title">
             <input
@@ -115,46 +180,116 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
             <textarea
               value={form.description}
               onChange={(e) => handleChange('description', e.target.value)}
-              rows={3}
+              rows={2}
               className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm resize-none"
             />
           </Field>
 
-          <Field label="Camera">
-            <input
-              type="text"
-              value={form.camera}
-              onChange={(e) => handleChange('camera', e.target.value)}
-              className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-            />
-          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Camera">
+              {addingCamera ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={form.camera}
+                    onChange={(e) => handleChange('camera', e.target.value)}
+                    placeholder="Type camera name..."
+                    className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                    autoFocus
+                  />
+                  {form.camera && (
+                    <p className="text-xs text-blue-400">"{form.camera}" will be saved as a new camera</p>
+                  )}
+                  <button
+                    onClick={() => { setAddingCamera(false); handleChange('camera', ''); }}
+                    className="text-xs text-gray-400 hover:text-white"
+                  >
+                    ← Pick from list
+                  </button>
+                </div>
+              ) : (
+                <select
+                  value={cameraNames.includes(form.camera) ? form.camera : isNewCamera ? '__custom' : ''}
+                  onChange={(e) => handleCameraSelect(e.target.value)}
+                  className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="">None</option>
+                  {cameras.map((c) => (
+                    <option key={c.name} value={c.name}>{c.name}</option>
+                  ))}
+                  {isNewCamera && (
+                    <option value="__custom" disabled>Custom: {form.camera}</option>
+                  )}
+                  <option value="__new__">+ Add new camera...</option>
+                </select>
+              )}
+              {isNewCamera && !addingCamera && (
+                <p className="text-xs text-amber-400 mt-1">Current value "{form.camera}" is not in the camera list</p>
+              )}
+            </Field>
 
-          <Field label="Lens">
-            <input
-              type="text"
-              value={form.lens}
-              onChange={(e) => handleChange('lens', e.target.value)}
-              className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-            />
-          </Field>
+            <Field label="Lens">
+              {addingLens ? (
+                <div className="space-y-2">
+                  <input
+                    type="text"
+                    value={form.lens}
+                    onChange={(e) => handleChange('lens', e.target.value)}
+                    placeholder="Type lens name..."
+                    className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                    autoFocus
+                  />
+                  {form.lens && (
+                    <p className="text-xs text-blue-400">"{form.lens}" will be saved as a new lens</p>
+                  )}
+                  <button
+                    onClick={() => { setAddingLens(false); handleChange('lens', ''); }}
+                    className="text-xs text-gray-400 hover:text-white"
+                  >
+                    ← Pick from list
+                  </button>
+                </div>
+              ) : (
+                <select
+                  value={lensNames.includes(form.lens) ? form.lens : isNewLens ? '__custom' : ''}
+                  onChange={(e) => handleLensSelect(e.target.value)}
+                  className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+                >
+                  <option value="">None</option>
+                  {lenses.map((l) => (
+                    <option key={l.name} value={l.name}>{l.name}</option>
+                  ))}
+                  {isNewLens && (
+                    <option value="__custom" disabled>Custom: {form.lens}</option>
+                  )}
+                  <option value="__new__">+ Add new lens...</option>
+                </select>
+              )}
+              {isNewLens && !addingLens && (
+                <p className="text-xs text-amber-400 mt-1">Current value "{form.lens}" is not in the lens list</p>
+              )}
+            </Field>
+          </div>
 
-          <Field label="Film">
-            <input
-              type="text"
-              value={form.film}
-              onChange={(e) => handleChange('film', e.target.value)}
-              className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-            />
-          </Field>
+          <div className="grid grid-cols-2 gap-4">
+            <Field label="Film">
+              <input
+                type="text"
+                value={form.film}
+                onChange={(e) => handleChange('film', e.target.value)}
+                className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+              />
+            </Field>
 
-          <Field label="Location">
-            <input
-              type="text"
-              value={form.location}
-              onChange={(e) => handleChange('location', e.target.value)}
-              className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
-            />
-          </Field>
+            <Field label="Location">
+              <input
+                type="text"
+                value={form.location}
+                onChange={(e) => handleChange('location', e.target.value)}
+                className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
+              />
+            </Field>
+          </div>
 
           <Field label="Date">
             <input
@@ -176,6 +311,8 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
             </div>
             <div className="flex gap-2">
               <input
+                id={tagId}
+                list="tag-suggestions"
                 type="text"
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
@@ -183,10 +320,32 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
                 placeholder="Add tag..."
                 className="flex-1 bg-neutral-800 border border-gray-700 rounded-lg px-3 py-1.5 text-sm"
               />
-              <button onClick={addTag} className="px-3 py-1.5 bg-neutral-700 rounded-lg text-sm hover:bg-neutral-600">
+              <button onClick={() => addTag()} className="px-3 py-1.5 bg-neutral-700 rounded-lg text-sm hover:bg-neutral-600">
                 Add
               </button>
             </div>
+            <datalist id="tag-suggestions">
+              {availableTags.filter((t) => !form.tags.includes(t)).map((t) => (
+                <option key={t} value={t} />
+              ))}
+            </datalist>
+
+            {availableTags.length > 0 && (
+              <div className="mt-3">
+                <p className="text-xs text-gray-500 mb-1.5 uppercase tracking-wider">Available tags</p>
+                <div className="flex flex-wrap gap-1.5">
+                  {availableTags.filter((t) => !form.tags.includes(t)).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => addTag(t)}
+                      className="text-xs px-2.5 py-1 bg-neutral-800 text-gray-300 rounded-full hover:bg-neutral-700 hover:text-white transition-colors"
+                    >
+                      + {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </Field>
 
           <Field label="Collections">
@@ -205,7 +364,7 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
             </div>
           </Field>
 
-          <div className="flex items-center gap-3 pt-2">
+          <div className="flex items-center gap-3 pt-1">
             <label className="flex items-center gap-2 text-sm cursor-pointer">
               <input
                 type="checkbox"
@@ -224,7 +383,7 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
             </label>
           </div>
 
-          <div className="flex gap-3 pt-4 border-t border-gray-800">
+          <div className="flex gap-3 pt-3 border-t border-gray-800">
             <button
               onClick={handleSave}
               disabled={saving}

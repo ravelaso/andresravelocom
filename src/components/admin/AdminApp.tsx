@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import PhotoGrid from './PhotoGrid';
 import PhotoEditor from './PhotoEditor';
@@ -77,6 +77,8 @@ export default function AdminApp() {
   const { toasts, addToast, dismissToast } = useToast();
   const [photos, setPhotos] = useState<AdminPhoto[]>([]);
   const [collections, setCollections] = useState<Record<string, Collection>>({});
+  const [cameras, setCameras] = useState<{ name: string }[]>([]);
+  const [lenses, setLenses] = useState<{ name: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<AdminPhoto | null>(null);
@@ -89,10 +91,12 @@ export default function AdminApp() {
     setLoading(true);
     setError(null);
 
-    const [photosRes, metaData, collectionsData] = await Promise.all([
+    const [photosRes, metaData, collectionsData, camerasData, lensesData] = await Promise.all([
       fetch('/api/admin/photos'),
       readDataFile('photos.json'),
       readDataFile('collections.json'),
+      readDataFile('cameras.json'),
+      readDataFile('lenses.json'),
     ]);
 
     if (!photosRes.ok) {
@@ -132,6 +136,8 @@ export default function AdminApp() {
 
     setPhotos(merged);
     setCollections(collectionsData);
+    setCameras(Array.isArray(camerasData) ? camerasData : []);
+    setLenses(Array.isArray(lensesData) ? lensesData : []);
     setLoading(false);
   }, [addToast]);
 
@@ -237,6 +243,19 @@ export default function AdminApp() {
     await writeDataFile('collections.json', updated);
   };
 
+  const handleSaveReferenceList = async (list: 'cameras' | 'lenses', data: { name: string }[]) => {
+    if (list === 'cameras') setCameras(data);
+    else setLenses(data);
+    const ok = await writeDataFile(`${list}.json`, data);
+    addToast(ok ? 'success' : 'error', ok ? `${list} saved` : `Failed to save ${list}`);
+  };
+
+  const availableTags = useMemo(() => {
+    const set = new Set<string>();
+    for (const p of photos) if (p.meta?.tags) p.meta.tags.forEach((t) => set.add(t));
+    return Array.from(set).sort();
+  }, [photos]);
+
   const collectionLabel = activeCollection && collections[activeCollection];
   const collectionPhotoCount = collectionLabel
     ? photos.filter((p) => collectionLabel.photos.includes(p.key)).length
@@ -301,9 +320,13 @@ export default function AdminApp() {
         <PhotoEditor
           photo={selectedPhoto}
           collections={collections}
+          cameras={cameras}
+          lenses={lenses}
+          availableTags={availableTags}
           onSave={handleSaveMeta}
           onDelete={handleDeletePhoto}
           onToggleCollection={handleToggleCollection}
+          onSaveReferenceList={handleSaveReferenceList}
           onClose={() => setSelectedPhoto(null)}
         />
       )}

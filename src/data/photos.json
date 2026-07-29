@@ -10,7 +10,7 @@
     "forSale": false,
     "description": "",
     "camera": "Leitz Minolta CL",
-    "lens": "",
+    "lens": "Voigtlander Nokton Classic MC 40mm f/1.4",
     "film": "Aurora 400",
     "date": "",
     "location": ""
@@ -53,9 +53,17 @@
   },
   "18140655943494179.jpg": {
     "title": "18140655943494179",
-    "tags": [],
+    "tags": [
+      "film"
+    ],
     "featured": false,
-    "forSale": false
+    "forSale": false,
+    "description": "",
+    "camera": "Nikon FM2",
+    "lens": "Nikkor AIs 50mm f/1.4",
+    "film": "Kentmere 200",
+    "date": "",
+    "location": ""
   },
   "18181007620329902.jpg": {
     "title": "18181007620329902",
@@ -77,9 +85,17 @@
   },
   "18104791144876839.jpg": {
     "title": "18104791144876839",
-    "tags": [],
+    "tags": [
+      "digital"
+    ],
     "featured": false,
-    "forSale": false
+    "forSale": false,
+    "description": "",
+    "camera": "Sony A7RV",
+    "lens": "",
+    "film": "",
+    "date": "",
+    "location": "Conservatorium Maastricht"
   },
   "18093015332513213.jpg": {
     "title": "18093015332513213",
