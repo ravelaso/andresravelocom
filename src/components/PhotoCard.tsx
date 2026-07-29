@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { GalleryImage } from '@/lib/useGallery';
 
 interface PhotoCardProps {
@@ -36,7 +36,7 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ image, onClick, style }) => {
   return (
     <div
       ref={imgRef}
-      className="overflow-hidden relative group cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fadeIn rounded-lg"
+      className="overflow-hidden relative cursor-pointer transition-all duration-300 hover:scale-105 hover:shadow-lg animate-fadeIn rounded-lg"
       onClick={onClick}
       style={style}
     >
@@ -68,34 +68,6 @@ const PhotoCard: React.FC<PhotoCardProps> = ({ image, onClick, style }) => {
           loading="lazy"
         />
       )}
-
-      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg flex flex-col justify-end p-4">
-        {image.tags.length > 0 && (
-          <div className="flex flex-wrap gap-1.5 mb-2">
-            {image.tags.slice(0, 4).map((tag) => (
-              <span
-                key={tag}
-                className="text-xs px-2 py-0.5 bg-white/20 backdrop-blur-sm rounded-full text-white"
-              >
-                {tag}
-              </span>
-            ))}
-            {image.tags.length > 4 && (
-              <span className="text-xs px-2 py-0.5 text-gray-300">
-                +{image.tags.length - 4}
-              </span>
-            )}
-          </div>
-        )}
-
-        <h3 className="text-white font-semibold text-sm truncate">{image.title}</h3>
-
-        {(image.camera || image.film) && (
-          <p className="text-gray-300 text-xs mt-0.5">
-            {[image.camera, image.film].filter(Boolean).join(' · ')}
-          </p>
-        )}
-      </div>
     </div>
   );
 };

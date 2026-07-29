@@ -3,7 +3,7 @@ import type { GalleryImage } from '@/lib/useGallery';
 
 interface FeaturedCarouselProps {
   images: GalleryImage[];
-  onImageClick: (url: string) => void;
+  onImageClick: (image: GalleryImage) => void;
 }
 
 const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClick }) => {
@@ -20,7 +20,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClic
         {images.map((img) => (
           <button
             key={img.key}
-            onClick={() => onImageClick(img.url)}
+            onClick={() => onImageClick(img)}
             className="snap-start shrink-0 w-48 group cursor-pointer text-left"
           >
             <div className="overflow-hidden rounded-xl aspect-[3/2] bg-gray-800">

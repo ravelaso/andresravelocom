@@ -25,7 +25,10 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
     hasFilters,
   } = useGallery(initialData);
 
-  const [modalImage, setModalImage] = useState<string | null>(null);
+  const [modalState, setModalState] = useState<{
+    images: GalleryImage[];
+    index: number;
+  } | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
   const [columns, setColumns] = useState(4);
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -68,31 +71,62 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
     return () => observer.disconnect();
   }, [hasMore, loading, loadMore]);
 
-  const openModal = (url: string) => {
-    setModalImage(url);
+  const openModal = (img: GalleryImage) => {
+    let idx = images.findIndex((i) => i.key === img.key);
+    if (idx >= 0) {
+      setModalState({ images, index: idx });
+    } else {
+      idx = featuredPhotos.findIndex((i) => i.key === img.key);
+      if (idx >= 0) {
+        setModalState({ images: featuredPhotos, index: idx });
+      }
+    }
     setModalLoading(true);
     document.body.style.overflow = 'hidden';
   };
 
+  const goNext = () => {
+    if (!modalState) return;
+    if (modalState.index < modalState.images.length - 1) {
+      setModalLoading(true);
+      setModalState({ ...modalState, index: modalState.index + 1 });
+    }
+  };
+
+  const goPrev = () => {
+    if (!modalState) return;
+    if (modalState.index > 0) {
+      setModalLoading(true);
+      setModalState({ ...modalState, index: modalState.index - 1 });
+    }
+  };
+
   const closeModal = () => {
-    setModalImage(null);
+    setModalState(null);
     setModalLoading(false);
     document.body.style.overflow = '';
   };
 
   useEffect(() => {
+    if (!modalState) return;
     const handler = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && modalImage) closeModal();
+      if (e.key === 'Escape') closeModal();
+      if (e.key === 'ArrowRight') goNext();
+      if (e.key === 'ArrowLeft') goPrev();
     };
     document.addEventListener('keydown', handler);
     return () => document.removeEventListener('keydown', handler);
-  }, [modalImage]);
+  }, [modalState]);
+
+  const current = modalState ? modalState.images[modalState.index] : null;
+  const isFirst = modalState ? modalState.index === 0 : true;
+  const isLast = modalState ? modalState.index === modalState.images.length - 1 : true;
 
   const cols = imageColumns(images);
 
   return (
     <>
-      <div className="lg:flex lg:gap-6 lg:px-5">
+       <div className="lg:flex lg:gap-6 lg:px-5">
         {/* Desktop sidebar */}
         <div className="hidden lg:block w-56 shrink-0">
           <PhotoFilter
@@ -134,7 +168,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
                   <PhotoCard
                     key={img.key}
                     image={img}
-                    onClick={() => openModal(img.url)}
+                    onClick={() => openModal(img)}
                     style={{ animationDelay: `${(ii * columns + ci) * 0.1}s` }}
                   />
                 ))}
@@ -169,39 +203,125 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
 
       <div ref={sentinelRef} className="h-20" />
 
-      {modalImage && (
+      {/* Modal */}
+      {modalState && current && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4"
+          className="fixed inset-0 bg-black z-50 flex flex-col"
           onClick={closeModal}
         >
+          {/* Nav bar */}
           <div
-            className="relative max-w-5xl w-full rounded-xl overflow-hidden shadow-xl"
+            className="flex items-center justify-between px-4 h-14 shrink-0 bg-black/60 border-b border-gray-800"
             onClick={(e) => e.stopPropagation()}
           >
             <button
+              onClick={goPrev}
+              disabled={isFirst}
+              className={`flex items-center gap-1.5 text-sm font-medium rounded-full px-4 py-1.5 transition-colors ${
+                isFirst
+                  ? 'text-gray-700 bg-transparent cursor-default'
+                  : 'text-gray-200 bg-white/10 hover:bg-white/20'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+              Previous
+            </button>
+
+            <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-white bg-black bg-opacity-70 hover:bg-red-600 rounded-full w-10 h-10 flex items-center justify-center z-10 transition-colors"
+              className="text-gray-300 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-colors"
               aria-label="Close"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
-            <div className="flex items-center justify-center min-h-[200px]">
+
+            <button
+              onClick={goNext}
+              disabled={isLast}
+              className={`flex items-center gap-1.5 text-sm font-medium rounded-full px-4 py-1.5 transition-colors ${
+                isLast
+                  ? 'text-gray-700 bg-transparent cursor-default'
+                  : 'text-gray-200 bg-white/10 hover:bg-white/20'
+              }`}
+            >
+              Next
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Image + metadata centered */}
+          <div className="flex-1 flex flex-col mx-auto max-w-5xl w-full min-h-0">
+            <div className="flex-1 flex items-center justify-center p-4 min-h-0">
               <img
-                src={modalImage}
-                alt="Full size image"
-                className="max-w-full max-h-[80vh] object-contain rounded-xl"
+                src={current.url}
+                alt={current.title}
+                className="max-w-full max-h-full object-contain rounded-xl"
+                onClick={(e) => e.stopPropagation()}
                 onLoad={() => setModalLoading(false)}
               />
               {modalLoading && (
-                <div className="absolute inset-0 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                   <div className="w-12 h-12 border-4 border-white border-t-blue-500 rounded-full animate-spin" />
                 </div>
               )}
             </div>
+
+            {/* Metadata panel */}
+            <div
+              className="shrink-0 bg-black/80 border-t border-gray-800 px-6 py-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <h2 className="text-white font-semibold text-base truncate">
+                  {current.title}
+                </h2>
+
+                <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400 mt-1.5">
+                  {current.camera && (
+                    <span>📷 {current.camera}</span>
+                  )}
+                  {current.film && (
+                    <span>🎞️ {current.film}</span>
+                  )}
+                  {current.lens && (
+                    <span>🔭 {current.lens}</span>
+                  )}
+                  {current.location && (
+                    <span>📍 {current.location}</span>
+                  )}
+                  {current.date && (
+                    <span>📅 {current.date}</span>
+                  )}
+                </div>
+
+                {current.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1.5 mt-2.5">
+                    {current.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="text-xs px-2.5 py-0.5 bg-white/10 text-gray-300 rounded-full"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <span className="shrink-0 text-sm text-gray-500 mt-1">
+                {modalState.index + 1} of {modalState.images.length}
+              </span>
+            </div>
           </div>
         </div>
+      </div>
       )}
     </>
   );
