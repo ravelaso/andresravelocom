@@ -1,6 +1,8 @@
-
 import type { APIRoute } from 'astro';
 import { env } from "cloudflare:workers";
+import type { PhotoMeta } from '@/types/photo';
+import rawPhotosData from '@/data/photos.json';
+import rawCollectionsData from '@/data/collections.json';
 
 interface PhotoObject {
     key: string;
@@ -29,18 +31,16 @@ export const GET: APIRoute = async ({ url }) => {
         const limit = parseInt(searchParams.get('limit') || '20');
         const offset = parseInt(searchParams.get('offset') || '0');
 
-        // Check if we have cached photos that are still fresh
         const now = Date.now();
         if (!cachedPhotos || (now - cacheTimestamp) > CACHE_DURATION) {
             console.log('Fetching all photos from R2...');
 
-            // Fetch ALL objects from the bucket
             const allPhotos: PhotoObject[] = [];
             let cursor: string | undefined;
 
             do {
                 const listResult = await bucket.list({
-                    limit: 1000, // Max per request
+                    limit: 1000,
                     cursor,
                     include: ['httpMetadata']
                 });
@@ -64,35 +64,88 @@ export const GET: APIRoute = async ({ url }) => {
                 cursor = listResult.truncated ? listResult.cursor : undefined;
             } while (cursor);
 
-            // Sort ALL photos by date descending (newest first)
             allPhotos.sort((a, b) => {
                 return new Date(b.lastModified).getTime() - new Date(a.lastModified).getTime();
             });
 
-            // Cache the sorted results
             cachedPhotos = allPhotos;
             cacheTimestamp = now;
 
             console.log(`Cached ${allPhotos.length} photos, newest first`);
         }
 
-        // Handle pagination from the sorted cache
-        const totalPhotos = cachedPhotos.length;
+        const allMeta = rawPhotosData as Record<string, PhotoMeta>;
+        const metadataMap = new Map<string, PhotoMeta>(Object.entries(allMeta));
+        const collectionsData = rawCollectionsData as Record<string, { title: string; description?: string; coverPhoto?: string; photos: string[] }>;
+
+        const tagFilters = searchParams.getAll('tag');
+        const collectionFilter = searchParams.get('collection') || null;
+
+        let filteredPhotos = cachedPhotos;
+        if (tagFilters.length > 0) {
+            filteredPhotos = filteredPhotos.filter(p => {
+                const meta = metadataMap.get(p.key);
+                return meta && tagFilters.every(t => meta.tags?.includes(t));
+            });
+        }
+        if (collectionFilter && collectionsData[collectionFilter]) {
+            const colSet = new Set(collectionsData[collectionFilter].photos);
+            filteredPhotos = filteredPhotos.filter(p => colSet.has(p.key));
+        }
+
+        function enrich(p: PhotoObject) {
+            const meta = metadataMap.get(p.key);
+            return {
+                ...p,
+                title: meta?.title ?? p.key,
+                description: meta?.description,
+                tags: meta?.tags ?? [],
+                camera: meta?.camera,
+                lens: meta?.lens,
+                film: meta?.film,
+                date: meta?.date,
+                location: meta?.location,
+                featured: meta?.featured ?? false,
+                forSale: meta?.forSale ?? false,
+            };
+        }
+
+        const featuredPhotos = filteredPhotos
+            .filter(p => metadataMap.get(p.key)?.featured)
+            .slice(0, 20)
+            .map(enrich);
+
+        const totalPhotos = filteredPhotos.length;
         const startIndex = offset;
         const endIndex = Math.min(startIndex + limit, totalPhotos);
 
-        const paginatedPhotos = cachedPhotos.slice(startIndex, endIndex);
+        const paginatedPhotos = filteredPhotos.slice(startIndex, endIndex);
         const hasMore = endIndex < totalPhotos;
 
+        const enrichedImages = paginatedPhotos.map(enrich);
+
+        const allTags = [...new Set(
+            Object.values(allMeta).flatMap(m => m.tags ?? [])
+        )];
+
+        const collectionBriefs = Object.entries(collectionsData).map(([slug, col]) => ({
+            slug,
+            title: col.title,
+            photoCount: col.photos.length,
+        }));
+
         return new Response(JSON.stringify({
-            images: paginatedPhotos,
+            images: enrichedImages,
             hasMore,
             cursor: hasMore ? (offset + limit).toString() : null,
-            total: totalPhotos
+            total: totalPhotos,
+            tags: allTags,
+            collections: collectionBriefs,
+            featured: featuredPhotos,
         }), {
             headers: {
                 'Content-Type': 'application/json',
-                'Cache-Control': 'public, max-age=300' // 5 minutes
+                'Cache-Control': 'public, max-age=300'
             }
         });
 
@@ -102,7 +155,10 @@ export const GET: APIRoute = async ({ url }) => {
             error: 'Failed to list photos',
             images: [],
             hasMore: false,
-            cursor: null
+            cursor: null,
+            tags: [],
+            collections: [],
+            featured: [],
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }

@@ -1,0 +1,14 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import AdminApp from "@/components/admin/AdminApp";
+import NavBar from "@/components/NavBar";
+
+if (!import.meta.env.DEV) {
+  return Astro.redirect('/404');
+}
+---
+
+<Layout title="Photo Admin">
+  <NavBar client:only="react" />
+  <AdminApp client:only="react" />
+</Layout>

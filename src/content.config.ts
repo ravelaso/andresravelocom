@@ -49,23 +49,11 @@ const devCollection = defineCollection({
 
 const photographyCollection = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/photography' }),
-  schema: z.discriminatedUnion('type', [
-    z.object({
-      type: z.literal('about'),
-      title: z.string(),
-      description: z.string().optional(),
-    }),
-    z.object({
-      type: z.literal('camera'),
-      title: z.string(),
-      details: z.array(z.string()).optional(),
-    }),
-    z.object({
-      type: z.literal('lens'),
-      title: z.string(),
-      details: z.array(z.string()).optional(),
-    }),
-  ]),
+  schema: z.object({
+    type: z.literal('about'),
+    title: z.string(),
+    description: z.string().optional(),
+  }),
 });
 
 export const collections = {

@@ -1,0 +1,31 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/NavBar";
+
+Astro.response.status = 404;
+---
+
+<Layout title="404 — Not Found">
+  <NavBar client:only="react" />
+  <main class="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
+    <svg viewBox="0 0 120 90" class="w-24 h-auto mb-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="12" y="28" width="96" height="52" rx="8" />
+      <circle cx="60" cy="54" r="18" />
+      <circle cx="60" cy="54" r="7" />
+      <rect x="42" y="20" width="36" height="13" rx="4" />
+      <rect x="80" y="22" width="12" height="14" rx="3" />
+      <path d="M 48 70 L 54 58 L 64 62 L 72 48" stroke-width="3.5" />
+      <line x1="72" y1="45" x2="76" y2="41" stroke-width="2.5" />
+    </svg>
+    <h1 class="text-8xl font-extrabold text-white/60 select-none">404</h1>
+    <p class="text-xl text-gray-400 mt-4 max-w-md">
+      Frame not found. This roll must have been a dud.
+    </p>
+    <a
+      href="/"
+      class="mt-8 px-6 py-3 bg-neutral-800 text-gray-200 rounded-xl border border-gray-700 hover:bg-neutral-700 transition"
+    >
+      Back to the index
+    </a>
+  </main>
+</Layout>

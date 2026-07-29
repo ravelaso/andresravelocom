@@ -1,7 +1,6 @@
 ---
 type: about
-title: About My Photography
+title: Film Photographer
 description: >
-  I am passionate about film photography and enjoy capturing moments with my collection of vintage cameras and lenses. 
-  Each piece in my collection has its own story and contributes to my creative journey.
+  I just really love taking pictures. Film, mostly — with cameras that have way more personality than I do. Every roll is a surprise. Some come out terrible. Some come out great. Either way, I keep shooting.
 ---
