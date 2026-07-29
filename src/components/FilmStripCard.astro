@@ -1,0 +1,32 @@
+---
+export interface Props {
+  title: string;
+  description?: string;
+  class?: string;
+}
+
+const { title, description, class: className } = Astro.props;
+---
+
+<div class:list={["w-full mt-20 relative", className]}>
+  <div class="relative bg-[#0a0a0a] border-y border-gray-800 px-8 py-24 overflow-hidden">
+
+    <div
+      class="absolute top-2 left-0 right-0 h-2.5"
+      style="background: repeating-linear-gradient(90deg, transparent 0px, transparent 22px, #333 22px, #333 42px, transparent 42px, transparent 64px)"
+    ></div>
+
+    <div
+      class="absolute bottom-2 left-0 right-0 h-2.5"
+      style="background: repeating-linear-gradient(90deg, transparent 0px, transparent 22px, #333 22px, #333 42px, transparent 42px, transparent 64px)"
+    ></div>
+
+    <div class="max-w-4xl mx-auto text-center">
+      <h1 class="text-4xl md:text-5xl font-extrabold text-white">{title}</h1>
+      {description && (
+        <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-2xl mx-auto">{description}</p>
+      )}
+    </div>
+
+  </div>
+</div>

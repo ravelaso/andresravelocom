@@ -2,6 +2,7 @@
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/NavBar";
 import PhotoGallery from "@/components/PhotoGallery";
+import FilmStripCard from "@/components/FilmStripCard.astro";
 import type { ApiResponseData } from "@/lib/useGallery";
 
 import { getCollection } from "astro:content";
@@ -33,33 +34,15 @@ const aboutContent = await getCollection(
     (entry: { data: { type: string; }; }) => entry.data.type === "about",
 );
 const about = aboutContent[0];
-
-import photogallerybg from "@/assets/photogallerybackground.jpg";
-
-const style = `
-        background-image: url('${photogallerybg.src}');
-`;
 ---
 
 <Layout>
     <NavBar client:only="react" />
 
-    <!-- Page Heading -->
-    <section
-        class="relative w-full bg-cover md:bg-contain bg-center py-20 px-4"
-        style={style}
-    >
-        <div
-            class="bg-black/60 backdrop-blur-sm p-8 rounded-xl max-w-4xl mx-auto text-center"
-        >
-            <h1 class="text-4xl md:text-5xl font-extrabold text-white">
-                {about.data.title}
-            </h1>
-            <p class="text-lg md:text-xl text-gray-300 mt-4">
-                {about.data.description}
-            </p>
-        </div>
-    </section>
+    <FilmStripCard
+        title={about.data.title}
+        description={about.data.description}
+    />
 
     <!-- Gallery Heading -->
     <h2
