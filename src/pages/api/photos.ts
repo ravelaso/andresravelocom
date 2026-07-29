@@ -2,6 +2,7 @@ import type { APIRoute } from 'astro';
 import { env } from "cloudflare:workers";
 import type { PhotoMeta } from '@/types/photo';
 import rawPhotosData from '@/data/photos.json';
+import rawCollectionsData from '@/data/collections.json';
 
 interface PhotoObject {
     key: string;
@@ -75,19 +76,28 @@ export const GET: APIRoute = async ({ url }) => {
 
         const allMeta = rawPhotosData as Record<string, PhotoMeta>;
         const metadataMap = new Map<string, PhotoMeta>(Object.entries(allMeta));
+        const collectionsData = rawCollectionsData as Record<string, { title: string; description?: string; coverPhoto?: string; photos: string[] }>;
 
-        const totalPhotos = cachedPhotos.length;
-        const startIndex = offset;
-        const endIndex = Math.min(startIndex + limit, totalPhotos);
+        const tagFilters = searchParams.getAll('tag');
+        const collectionFilter = searchParams.get('collection') || null;
 
-        const paginatedPhotos = cachedPhotos.slice(startIndex, endIndex);
-        const hasMore = endIndex < totalPhotos;
+        let filteredPhotos = cachedPhotos;
+        if (tagFilters.length > 0) {
+            filteredPhotos = filteredPhotos.filter(p => {
+                const meta = metadataMap.get(p.key);
+                return meta && tagFilters.every(t => meta.tags?.includes(t));
+            });
+        }
+        if (collectionFilter && collectionsData[collectionFilter]) {
+            const colSet = new Set(collectionsData[collectionFilter].photos);
+            filteredPhotos = filteredPhotos.filter(p => colSet.has(p.key));
+        }
 
-        const enrichedImages = paginatedPhotos.map((photo) => {
-            const meta = metadataMap.get(photo.key);
+        function enrich(p: PhotoObject) {
+            const meta = metadataMap.get(p.key);
             return {
-                ...photo,
-                title: meta?.title ?? photo.key,
+                ...p,
+                title: meta?.title ?? p.key,
                 description: meta?.description,
                 tags: meta?.tags ?? [],
                 camera: meta?.camera,
@@ -98,13 +108,40 @@ export const GET: APIRoute = async ({ url }) => {
                 featured: meta?.featured ?? false,
                 forSale: meta?.forSale ?? false,
             };
-        });
+        }
+
+        const featuredPhotos = filteredPhotos
+            .filter(p => metadataMap.get(p.key)?.featured)
+            .slice(0, 20)
+            .map(enrich);
+
+        const totalPhotos = filteredPhotos.length;
+        const startIndex = offset;
+        const endIndex = Math.min(startIndex + limit, totalPhotos);
+
+        const paginatedPhotos = filteredPhotos.slice(startIndex, endIndex);
+        const hasMore = endIndex < totalPhotos;
+
+        const enrichedImages = paginatedPhotos.map(enrich);
+
+        const allTags = [...new Set(
+            Object.values(allMeta).flatMap(m => m.tags ?? [])
+        )];
+
+        const collectionBriefs = Object.entries(collectionsData).map(([slug, col]) => ({
+            slug,
+            title: col.title,
+            photoCount: col.photos.length,
+        }));
 
         return new Response(JSON.stringify({
             images: enrichedImages,
             hasMore,
             cursor: hasMore ? (offset + limit).toString() : null,
-            total: totalPhotos
+            total: totalPhotos,
+            tags: allTags,
+            collections: collectionBriefs,
+            featured: featuredPhotos,
         }), {
             headers: {
                 'Content-Type': 'application/json',
@@ -118,7 +155,10 @@ export const GET: APIRoute = async ({ url }) => {
             error: 'Failed to list photos',
             images: [],
             hasMore: false,
-            cursor: null
+            cursor: null,
+            tags: [],
+            collections: [],
+            featured: [],
         }), {
             status: 500,
             headers: { 'Content-Type': 'application/json' }

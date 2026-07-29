@@ -2,29 +2,21 @@
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/NavBar";
 import PhotoGallery from "@/components/PhotoGallery";
+import type { ApiResponseData } from "@/lib/useGallery";
 
 import { getCollection } from "astro:content";
 
 export const prerender = false;
 
-interface PhotoObject {
-    key: string;
-    url: string;
-    size: number;
-    lastModified: string;
-}
-
-interface ApiResponse {
-    images: PhotoObject[];
-    hasMore: boolean;
-    cursor: string | null;
-}
-
 // Load initial data on server-side
-let initialData: ApiResponse = {
+let initialData: ApiResponseData = {
     images: [],
     hasMore: false,
     cursor: null,
+    total: 0,
+    tags: [],
+    collections: [],
+    featured: [],
 };
 
 try {
