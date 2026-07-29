@@ -83,6 +83,7 @@ export default function AdminApp() {
   const [showUpload, setShowUpload] = useState(false);
   const [editingCollection, setEditingCollection] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'featured' | 'untagged'>('all');
+  const [activeCollection, setActiveCollection] = useState<string | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -138,7 +139,21 @@ export default function AdminApp() {
     loadData();
   }, [loadData]);
 
+  const handleFilterChange = (f: 'all' | 'featured' | 'untagged') => {
+    setActiveCollection(null);
+    setActiveFilter(f);
+  };
+
+  const handleSelectCollection = (slug: string | null) => {
+    setActiveCollection(slug);
+    if (slug) setActiveFilter('all');
+  };
+
   const filteredPhotos = photos.filter((p) => {
+    if (activeCollection) {
+      const col = collections[activeCollection];
+      return col ? col.photos.includes(p.key) : false;
+    }
     if (activeFilter === 'featured') return p.meta?.featured;
     if (activeFilter === 'untagged') return !p.meta?.tags?.length;
     return true;
@@ -213,6 +228,7 @@ export default function AdminApp() {
   };
 
   const handleDeleteCollection = async (slug: string) => {
+    if (slug === activeCollection) setActiveCollection(null);
     const updated: Record<string, Collection> = {};
     for (const key of Object.keys(collections)) {
       if (key !== slug) updated[key] = collections[key];
@@ -221,12 +237,19 @@ export default function AdminApp() {
     await writeDataFile('collections.json', updated);
   };
 
+  const collectionLabel = activeCollection && collections[activeCollection];
+  const collectionPhotoCount = collectionLabel
+    ? photos.filter((p) => collectionLabel.photos.includes(p.key)).length
+    : 0;
+
   return (
     <>
       <AdminLayout
         collections={collections}
+        activeCollection={activeCollection}
         activeFilter={activeFilter}
-        onFilterChange={setActiveFilter}
+        onFilterChange={handleFilterChange}
+        onSelectCollection={handleSelectCollection}
         onAddCollection={() => setEditingCollection('__new__')}
         onEditCollection={setEditingCollection}
         onDeleteCollection={handleDeleteCollection}
@@ -240,11 +263,37 @@ export default function AdminApp() {
         ) : error ? (
           <div className="text-red-400 text-center py-8">{error}</div>
         ) : (
-          <PhotoGrid
-            photos={filteredPhotos}
-            collections={collections}
-            onSelect={setSelectedPhoto}
-          />
+          <>
+            {collectionLabel && (
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => handleSelectCollection(null)}
+                    className="text-sm text-blue-400 hover:text-blue-300"
+                  >
+                    ← All Photos
+                  </button>
+                  <h2 className="text-lg font-semibold">
+                    {collectionLabel.title}
+                    <span className="text-sm font-normal text-gray-400 ml-2">
+                      {collectionPhotoCount} photo{collectionPhotoCount !== 1 ? 's' : ''}
+                    </span>
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setEditingCollection(activeCollection)}
+                  className="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                >
+                  Edit Collection
+                </button>
+              </div>
+            )}
+            <PhotoGrid
+              photos={filteredPhotos}
+              collections={collections}
+              onSelect={setSelectedPhoto}
+            />
+          </>
         )}
       </AdminLayout>
 

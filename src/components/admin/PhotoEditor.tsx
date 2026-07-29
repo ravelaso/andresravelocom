@@ -93,7 +93,7 @@ export default function PhotoEditor({ photo, collections, onSave, onDelete, onTo
 
   return (
     <div className="fixed inset-0 z-50 bg-black/70 flex items-start justify-end">
-      <div className="w-full max-w-lg bg-neutral-900 h-full overflow-y-auto border-l border-gray-800">
+      <div className="w-full max-w-2xl bg-neutral-900 h-full overflow-y-auto border-l border-gray-800">
         <div className="sticky top-0 bg-neutral-900 border-b border-gray-800 px-6 py-4 flex items-center justify-between">
           <h2 className="font-semibold truncate">{photo.meta?.title || photo.key}</h2>
           <button onClick={onClose} className="text-gray-400 hover:text-white text-xl leading-none">&times;</button>

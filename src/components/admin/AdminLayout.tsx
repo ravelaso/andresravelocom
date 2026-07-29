@@ -10,8 +10,10 @@ interface Collection {
 
 interface AdminLayoutProps {
   collections: Record<string, Collection>;
+  activeCollection: string | null;
   activeFilter: 'all' | 'featured' | 'untagged';
   onFilterChange: (f: 'all' | 'featured' | 'untagged') => void;
+  onSelectCollection: (slug: string | null) => void;
   onAddCollection: () => void;
   onEditCollection: (slug: string) => void;
   onDeleteCollection: (slug: string) => void;
@@ -21,19 +23,16 @@ interface AdminLayoutProps {
 
 export default function AdminLayout({
   collections,
+  activeCollection,
   activeFilter,
   onFilterChange,
+  onSelectCollection,
   onAddCollection,
   onEditCollection,
   onDeleteCollection,
   onUpload,
   children,
 }: AdminLayoutProps) {
-  const filterCount = (f: 'all' | 'featured' | 'untagged'): number => {
-    if (f === 'all') return Object.keys(collections).length;
-    return 0;
-  };
-
   return (
     <div className="min-h-screen bg-neutral-950 text-gray-200">
       <header className="border-b border-gray-800 px-6 py-4 flex items-center justify-between">
@@ -51,14 +50,28 @@ export default function AdminLayout({
       <div className="flex">
         <aside className="w-64 shrink-0 border-r border-gray-800 p-4 h-[calc(100vh-65px)] overflow-y-auto">
           <nav className="space-y-1 mb-6">
-            <FilterButton label="All" active={activeFilter === 'all'} onClick={() => onFilterChange('all')} />
-            <FilterButton label="Featured" active={activeFilter === 'featured'} onClick={() => onFilterChange('featured')} />
-            <FilterButton label="Untagged" active={activeFilter === 'untagged'} onClick={() => onFilterChange('untagged')} />
+            <FilterButton
+              label="All"
+              active={activeFilter === 'all' && !activeCollection}
+              onClick={() => { onSelectCollection(null); onFilterChange('all'); }}
+            />
+            <FilterButton
+              label="Featured"
+              active={activeFilter === 'featured'}
+              onClick={() => { onSelectCollection(null); onFilterChange('featured'); }}
+            />
+            <FilterButton
+              label="Untagged"
+              active={activeFilter === 'untagged'}
+              onClick={() => { onSelectCollection(null); onFilterChange('untagged'); }}
+            />
           </nav>
 
           <div className="border-t border-gray-800 pt-4">
             <CollectionManager
               collections={collections}
+              activeCollection={activeCollection}
+              onSelect={onSelectCollection}
               onAdd={onAddCollection}
               onEdit={onEditCollection}
               onDelete={onDeleteCollection}
