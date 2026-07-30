@@ -36,9 +36,9 @@ export const POST: APIRoute = async ({ request }) => {
 
         const toEmail = env.CONTACT_EMAIL;
         const resendPayload = {
-            from: toEmail,
+            from: `${name} via Contact Form <${toEmail}>`,
             to: [toEmail],
-            subject: `New inquiry from ${name}`,
+            subject: `New inquiry from ${name} (${email})`,
             html: `
                 <p><strong>Name:</strong> ${name}</p>
                 <p><strong>Email:</strong> ${email}</p>
