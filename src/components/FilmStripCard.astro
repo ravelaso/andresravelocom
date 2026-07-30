@@ -6,6 +6,7 @@ export interface Props {
 }
 
 const { title, description, class: className } = Astro.props;
+import InstagramLink from './InstagramLink.astro';
 ---
 
 <div class:list={["w-full relative", className]}>
@@ -33,6 +34,9 @@ const { title, description, class: className } = Astro.props;
           {description}
         </p>
       )}
+      <div class="mt-8 flex justify-center">
+        <InstagramLink />
+      </div>
     </div>
 
   </div>

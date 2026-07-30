@@ -130,7 +130,7 @@ const NavBar: React.FC = () => {
 
                 <div className="border-t border-white/5 px-8 py-6">
                     <p className="text-neutral-700 text-xs tracking-wider uppercase">
-                        &copy; 2025 Andres Ravelo
+                        &copy; 2026 Andres Ravelo
                     </p>
                 </div>
             </div>

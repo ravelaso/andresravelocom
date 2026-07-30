@@ -85,10 +85,10 @@ const { Content } = await render(project);
     </header>
 
     {
-      project.data.coverImage && (
+      project.data.coverImage?.filter(Boolean).length && (
         <div class="mb-12 rounded-lg overflow-hidden border border-neutral-800">
           <div class="flex overflow-x-auto space-x-4 p-4 bg-neutral-900 rounded-lg">
-            {project.data.coverImage.map((image) => (
+            {project.data.coverImage.filter(Boolean).map((image) => (
               <div class="flex-none w-64 h-64 md:w-96 md:h-96">
                 <Image
                   src={image}

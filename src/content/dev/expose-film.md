@@ -2,12 +2,11 @@
 type: project
 title: "Expose Film"
 description: "Your Film Photography companion for iOS / Android App"
-date: 2025-08-09
+date: 2026-01-01
 tags: ["flutter", "ios", "android"]
 url: "https://github.com/ravelaso/expose-film"
 tech: ["Flutter", "iOS", "Android"]
 category: "mobile"
-coverImage: ["@/assets/homepage.jpg", "@/assets/rollspage.jpg"]
 ---
 
 # Expose Film

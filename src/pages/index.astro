@@ -2,6 +2,7 @@
 import Layout from '@/layouts/Layout.astro';
 import NavBar from '@/components/NavBar';
 import FilmStripCard from '@/components/FilmStripCard.astro';
+import InstagramLink from '@/components/InstagramLink.astro';
 import { getCollection } from "astro:content";
 
 export const prerender = false;
@@ -33,9 +34,9 @@ try {
     />
 
     <!-- Featured Work Preview -->
-    <section class="max-w-6xl mx-auto px-4 py-24">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Recent Frames</h2>
+    <section class="max-w-6xl mx-auto px-4 py-48">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl md:text-6xl font-bold text-white mb-4">Recent Frames</h2>
             <p class="text-gray-400 text-lg">A handful of frames from recent rolls</p>
         </div>
 
@@ -68,10 +69,10 @@ try {
     </section>
 
     <!-- Expose Film Section -->
-    <section class="max-w-5xl mx-auto px-4 py-24 border-t border-neutral-900">
+    <section class="max-w-5xl mx-auto px-4 py-48 border-t border-neutral-900">
         <div class="text-center">
             <p class="text-xs tracking-[0.25em] uppercase text-neutral-500 mb-4">In Development</p>
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Expose Film</h2>
+            <h2 class="text-5xl md:text-6xl font-bold text-white mb-4">Expose Film</h2>
             <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
                 A film photography companion app for iOS and Android. Meter light, track frames across rolls,
                 and keep a memorandum of every exposure. Built with Flutter.
@@ -89,15 +90,18 @@ try {
     </section>
 
     <!-- Contact Section -->
-    <section class="max-w-lg mx-auto px-4 py-24 border-t border-neutral-900">
-        <div class="text-center mb-12">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-4">Get in Touch</h2>
+    <section class="max-w-lg mx-auto px-4 py-48 border-t border-neutral-900">
+        <div class="text-center mb-16">
+            <h2 class="text-5xl md:text-6xl font-bold text-white mb-4">Get in Touch</h2>
             <p class="text-gray-400 text-lg">
                 Interested in a photoshoot or collaboration?
             </p>
+            <div class="mt-8 flex justify-center">
+                <InstagramLink />
+            </div>
         </div>
 
-        <div class="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8">
+        <div class="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8" id="contact-form-container">
             <form id="contact-form" class="space-y-6">
                 <div>
                     <label for="name" class="block text-sm font-medium text-gray-300 mb-2">
@@ -152,6 +156,7 @@ try {
                 </button>
             </form>
         </div>
+
     </section>
 </Layout>
 
