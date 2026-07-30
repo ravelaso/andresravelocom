@@ -67,9 +67,17 @@
   },
   "18104791144876839.jpg": {
     "title": "",
-    "tags": [],
+    "tags": [
+      "digital"
+    ],
     "featured": false,
-    "forSale": false
+    "forSale": false,
+    "description": "",
+    "camera": "Sony A7RV",
+    "lens": "",
+    "film": "",
+    "date": "",
+    "location": ""
   },
   "18093015332513213.jpg": {
     "title": "",
@@ -529,21 +537,31 @@
   },
   "503519027_17861754741426581_9174628552552395293_n_18050649800141243.jpg": {
     "title": "",
-    "tags": [],
+    "tags": [
+      "digital"
+    ],
     "featured": false,
-    "forSale": false
+    "forSale": false,
+    "description": "",
+    "camera": "Lumix S5IIX",
+    "lens": "",
+    "film": "",
+    "date": "",
+    "location": ""
   },
   "503551114_17861754366426581_2739583052617534349_n_18079402531862796.jpg": {
     "title": "",
     "tags": [],
     "featured": false,
-    "forSale": false
+    "forSale": false,
+    "camera": "Lumix S5IIX"
   },
   "502409652_17861754570426581_6943605459650387183_n_18033897335417692.jpg": {
     "title": "",
     "tags": [],
     "featured": false,
-    "forSale": false
+    "forSale": false,
+    "camera": "Lumix S5IIX"
   },
   "503321926_17859255264426581_3196096018433469527_n_18101408509538935.jpg": {
     "title": "",
