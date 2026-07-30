@@ -2,14 +2,10 @@
 import Layout from "@/layouts/Layout.astro";
 import NavBar from "@/components/NavBar";
 import PhotoGallery from "@/components/PhotoGallery";
-import FilmStripCard from "@/components/FilmStripCard.astro";
 import type { ApiResponseData } from "@/lib/useGallery";
-
-import { getCollection } from "astro:content";
 
 export const prerender = false;
 
-// Load initial data on server-side
 let initialData: ApiResponseData = {
     images: [],
     hasMore: false,
@@ -28,29 +24,15 @@ try {
 } catch (error) {
     console.error("Error loading initial images:", error);
 }
-
-const aboutContent = await getCollection(
-    "photography",
-    (entry: { data: { type: string; }; }) => entry.data.type === "about",
-);
-const about = aboutContent[0];
 ---
 
-<Layout>
+<Layout title="Gallery — Andres Ravelo">
     <NavBar client:only="react" />
 
-    <FilmStripCard
-        title={about.data.title}
-        description={about.data.description}
-    />
+    <div>
+        <h1 class="text-4xl md:text-5xl font-bold text-center text-white pt-28 pb-2">Gallery</h1>
+        <p class="text-gray-400 text-center mb-4 text-lg">All photos shot on film unless noted</p>
+    </div>
 
-    <!-- Gallery Heading -->
-    <h2
-        class="text-3xl md:text-4xl font-bold text-center text-white mt-24 mb-8"
-    >
-        Image Gallery
-    </h2>
-
-    <!-- Gallery Component -->
     <PhotoGallery client:only="react" initialData={initialData} />
 </Layout>

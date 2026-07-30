@@ -1,0 +1,122 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/NavBar";
+import { Image } from "astro:assets";
+import { getEntry, render } from "astro:content";
+
+export const prerender = true;
+
+const exposeProject = await getEntry("dev", "expose-film");
+
+if (!exposeProject) {
+    throw new Error("Expose Film project not found in dev collection");
+}
+
+const { Content } = await render(exposeProject);
+const { data } = exposeProject;
+---
+
+<Layout title="Expose Film — Andres Ravelo">
+    <NavBar client:only="react" />
+
+    <main class="max-w-4xl mx-auto px-4 py-12 text-neutral-100">
+        <div class="mb-6 pt-8">
+            <a
+                href="/"
+                class="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition"
+            >
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 19l-7-7 7-7"
+                    />
+                </svg>
+                Back to Home
+            </a>
+        </div>
+
+        <header class="mb-10">
+            <h1 class="text-4xl font-bold mb-2">{data.title}</h1>
+            <p class="text-neutral-400 text-sm mb-2">
+                {data.date.toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                })}
+                {data.category && ` \u2022 ${data.category}`}
+            </p>
+
+            {data.tech && (
+                <div class="flex flex-wrap gap-2 mt-4">
+                    {data.tech.map((tech: string) => (
+                        <span class="bg-neutral-800 text-neutral-300 text-sm px-3 py-1 rounded-full border border-neutral-700">
+                            {tech}
+                        </span>
+                    ))}
+                </div>
+            )}
+
+            {data.url && (
+                <div class="flex mt-auto pt-8">
+                    <a
+                        href={data.url}
+                        class="text-sm px-4 py-2 bg-neutral-100 text-black rounded hover:bg-neutral-200 transition"
+                    >
+                        See on GitHub
+                    </a>
+                </div>
+            )}
+        </header>
+
+        {data.coverImage && (
+            <div class="mb-12 rounded-lg overflow-hidden border border-neutral-800">
+                <div class="flex overflow-x-auto space-x-4 p-4 bg-neutral-900 rounded-lg">
+                    {data.coverImage.map((image) => (
+                        <div class="flex-none w-64 h-64 md:w-96 md:h-96">
+                            <Image
+                                src={image}
+                                alt={data.title}
+                                class="w-full h-full object-contain rounded-lg"
+                                format="webp"
+                                sizes="(max-width: 768px) 100vw, 768px"
+                            />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )}
+
+        <article class="prose prose-invert prose-neutral prose-lg max-w-none">
+            <Content />
+        </article>
+
+        <footer class="mt-16 pt-8 border-t border-neutral-800">
+            <a
+                href="/"
+                class="inline-flex items-center gap-2 text-neutral-400 hover:text-white transition"
+            >
+                <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 19l-7-7 7-7"
+                    />
+                </svg>
+                Back to Home
+            </a>
+        </footer>
+    </main>
+</Layout>

@@ -8,23 +8,30 @@ export interface Props {
 const { title, description, class: className } = Astro.props;
 ---
 
-<div class:list={["w-full mt-20 relative", className]}>
-  <div class="relative bg-[#0a0a0a] border-y border-gray-800 px-8 py-24 overflow-hidden">
+<div class:list={["w-full relative", className]}>
+  <div class="relative bg-[#0a0a0a] border-y border-gray-800 px-8 py-32 md:py-48 overflow-hidden">
 
     <div
-      class="absolute top-2 left-0 right-0 h-2.5"
+      class="absolute top-3 left-0 right-0 h-3"
       style="background: repeating-linear-gradient(90deg, transparent 0px, transparent 22px, #333 22px, #333 42px, transparent 42px, transparent 64px)"
     ></div>
 
     <div
-      class="absolute bottom-2 left-0 right-0 h-2.5"
+      class="absolute bottom-3 left-0 right-0 h-3"
       style="background: repeating-linear-gradient(90deg, transparent 0px, transparent 22px, #333 22px, #333 42px, transparent 42px, transparent 64px)"
     ></div>
 
-    <div class="max-w-4xl mx-auto text-center">
-      <h1 class="text-4xl md:text-5xl font-extrabold text-white">{title}</h1>
+    <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(255,255,255,0.03) 0%, transparent 70%)"></div>
+
+    <div class="max-w-5xl mx-auto text-center relative z-10">
+      <p class="text-sm md:text-base uppercase tracking-[0.3em] text-gray-500 mb-6">Andres Ravelo</p>
+      <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-white leading-tight tracking-tight">
+        {title}
+      </h1>
       {description && (
-        <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-2xl mx-auto">{description}</p>
+        <p class="text-lg md:text-xl lg:text-2xl text-gray-300 mt-6 max-w-3xl mx-auto leading-relaxed">
+          {description}
+        </p>
       )}
     </div>
 
