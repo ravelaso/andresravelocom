@@ -1,25 +1,26 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import NavBar from "@/components/NavBar";
-import { Image } from "astro:assets";
-import { getCollection, render, type CollectionEntry } from "astro:content";
-
-
-export const prerender = true;
-
-export async function getStaticPaths() {
-  const projects = await getCollection("dev", ({ data }) => data.type === "project");
-
-  return projects.map((project) => ({
-    params: { slug: project.id },
-    props: { project },
-  }));
-}
-
-const { project } = Astro.props;
-const { Content } = await render(project);
+// import Layout from "@/layouts/Layout.astro";
+// import NavBar from "@/components/NavBar";
+// import { Image } from "astro:assets";
+// import { getCollection, render, type CollectionEntry } from "astro:content";
+//
+//
+// export const prerender = true;
+//
+// export async function getStaticPaths() {
+//   const projects = await getCollection("dev", ({ data }) => data.type === "project");
+//
+//   return projects.map((project) => ({
+//     params: { slug: project.id },
+//     props: { project },
+//   }));
+// }
+//
+// const { project } = Astro.props;
+// const { Content } = await render(project);
 ---
 
+<!--
 <Layout>
   <NavBar client:only="react" />
 
@@ -130,3 +131,4 @@ const { Content } = await render(project);
     </footer>
   </main>
 </Layout>
+-->

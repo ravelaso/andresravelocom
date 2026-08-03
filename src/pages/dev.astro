@@ -1,44 +1,45 @@
 ---
-import Layout from "@/layouts/Layout.astro";
-import NavBar from "@/components/NavBar";
-import DevCard from "@/components/DevCard.astro";
-import { getCollection, type CollectionEntry } from "astro:content";
-
-export const prerender = true;
-
-type DevEntry = CollectionEntry<"dev">;
-type ProjectEntry = Extract<DevEntry, { data: { type: "project" } }>;
-type AboutEntry = Extract<DevEntry, { data: { type: "about" } }>;
-
-function isProject(entry: DevEntry): entry is ProjectEntry {
-  return entry.data.type === "project";
-}
-
-function isAbout(entry: DevEntry): entry is AboutEntry {
-  return entry.data.type === "about";
-}
-
-const devEntries = await getCollection("dev");
-const aboutEntry = devEntries.find(isAbout);
-const projects = devEntries.filter(isProject);
-
-const sortedProjects = projects.sort(
-  (a, b) => b.data.date.getTime() - a.data.date.getTime(),
-);
-
-const frontend = aboutEntry?.data.frontend ?? [];
-const backend = aboutEntry?.data.backend ?? [];
-const cloud = aboutEntry?.data.cloud ?? [];
+// import Layout from "@/layouts/Layout.astro";
+// import NavBar from "@/components/NavBar";
+// import DevCard from "@/components/DevCard.astro";
+// import { getCollection, type CollectionEntry } from "astro:content";
+//
+// export const prerender = true;
+//
+// type DevEntry = CollectionEntry<"dev">;
+// type ProjectEntry = Extract<DevEntry, { data: { type: "project" } }>;
+// type AboutEntry = Extract<DevEntry, { data: { type: "about" } }>;
+//
+// function isProject(entry: DevEntry): entry is ProjectEntry {
+//   return entry.data.type === "project";
+// }
+//
+// function isAbout(entry: DevEntry): entry is AboutEntry {
+//   return entry.data.type === "about";
+// }
+//
+// const devEntries = await getCollection("dev");
+// const aboutEntry = devEntries.find(isAbout);
+// const projects = devEntries.filter(isProject);
+//
+// const sortedProjects = projects.sort(
+//   (a, b) => b.data.date.getTime() - a.data.date.getTime(),
+// );
+//
+// const frontend = aboutEntry?.data.frontend ?? [];
+// const backend = aboutEntry?.data.backend ?? [];
+// const cloud = aboutEntry?.data.cloud ?? [];
 ---
 
+<!--
 <Layout>
   <NavBar client:only="react" />
 
-  <!-- About + Skills Combined -->
+  About + Skills Combined
   <section
     class="max-w-5xl mx-auto px-4 mt-12 mb-24 grid md:grid-cols-2 gap-12 items-start"
   >
-    <!-- About Text -->
+    About Text
     <div>
       <h1 class="text-4xl font-bold text-paper mb-4">Development Work</h1>
       <p class="text-body text-lg">
@@ -49,7 +50,7 @@ const cloud = aboutEntry?.data.cloud ?? [];
       </p>
     </div>
 
-    <!-- Skills List -->
+    Skills List
     <div class="space-y-8">
       <div>
         <h3 class="text-lg font-semibold text-paper mb-2">Frontend</h3>
@@ -100,3 +101,4 @@ const cloud = aboutEntry?.data.cloud ?? [];
     {sortedProjects.map((project) => <DevCard project={project} />)}
   </section>
 </Layout>
+-->
