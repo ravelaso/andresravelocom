@@ -1,0 +1,39 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+type LibraryData = Extract<
+    CollectionEntry<"exposeFilm">["data"],
+    { type: "library" }
+>;
+
+interface Props {
+    library: LibraryData;
+}
+
+const { library } = Astro.props;
+const { eyebrow, title, description, items } = library;
+---
+
+<section class="py-48">
+    <div class="max-w-5xl mx-auto px-4">
+        <div class="max-w-3xl mb-16">
+            <p class="text-xs tracking-[0.25em] uppercase text-muted mb-4">{eyebrow}</p>
+            <h2 class="text-5xl md:text-6xl font-bold text-paper mb-4">{title}</h2>
+            <p class="text-body text-lg leading-relaxed">{description}</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-6">
+            {items.map((item) => (
+                <div class="bg-surface/60 border border-line rounded-2xl p-8">
+                    <div class="flex items-start gap-5">
+                        <span class="text-3xl flex-shrink-0">{item.icon}</span>
+                        <div>
+                            <h3 class="text-xl font-semibold text-paper mb-2">{item.title}</h3>
+                            <p class="text-body text-sm leading-relaxed">{item.description}</p>
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    </div>
+</section>
