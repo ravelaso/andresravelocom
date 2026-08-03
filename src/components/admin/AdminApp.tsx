@@ -5,8 +5,9 @@ import PhotoEditor from './PhotoEditor';
 import UploadZone from './UploadZone';
 import CollectionEditor from './CollectionEditor';
 import BatchEditor from './BatchEditor';
+import TagPicker from './TagPicker';
 import NotificationToast, { useToast } from './NotificationToast';
-import type { AdminPhoto, AdminPhotosResponse, AdminApiError, PhotoMeta, PhotoCollection, ReferenceList } from '@/types/admin';
+import type { AdminPhoto, AdminPhotosResponse, AdminApiError, PhotoMeta, PhotoCollection, ReferenceList, TagSummary } from '@/types/admin';
 
 function buildMetaMap(photos: AdminPhoto[]): Record<string, PhotoMeta> {
   const map: Record<string, PhotoMeta> = {};
@@ -52,6 +53,8 @@ export default function AdminApp() {
   const [editingCollection, setEditingCollection] = useState<string | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'featured' | 'untagged'>('all');
   const [activeCollection, setActiveCollection] = useState<string | null>(null);
+  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [tagPickerOpen, setTagPickerOpen] = useState(false);
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const [batchEditorOpen, setBatchEditorOpen] = useState(false);
 
@@ -117,15 +120,25 @@ export default function AdminApp() {
 
   const handleFilterChange = (f: 'all' | 'featured' | 'untagged') => {
     setActiveCollection(null);
+    setActiveTag(null);
     setActiveFilter(f);
   };
 
   const handleSelectCollection = (slug: string | null) => {
     setActiveCollection(slug);
+    setActiveTag(null);
     if (slug) setActiveFilter('all');
   };
 
+  const handleSelectTag = (tag: string) => {
+    setActiveTag(tag);
+    setActiveCollection(null);
+    setActiveFilter('all');
+    setSelectedKeys(new Set());
+  };
+
   const filteredPhotos = photos.filter((p) => {
+    if (activeTag) return p.meta?.tags?.includes(activeTag);
     if (activeCollection) {
       const col = collections[activeCollection];
       return col ? col.photos.includes(p.key) : false;
@@ -286,6 +299,76 @@ export default function AdminApp() {
     }
   };
 
+  const handleSaveTagMembers = async (tag: string, addedKeys: string[], removedKeys: string[]) => {
+    const added = new Set(addedKeys);
+    const removed = new Set(removedKeys);
+    const updated = photos.map((p) => {
+      if (!added.has(p.key) && !removed.has(p.key)) return p;
+      const currentTags = p.meta?.tags ?? [];
+      const tags = added.has(p.key)
+        ? currentTags.includes(tag) ? currentTags : [...currentTags, tag]
+        : currentTags.filter((t) => t !== tag);
+      return { ...p, meta: { ...p.meta, tags } as PhotoMeta };
+    });
+    setPhotos(updated);
+    const ok = await writeDataFile('photos.json', buildMetaMap(updated));
+    const addedMsg = addedKeys.length ? `Added ${addedKeys.length} photo${addedKeys.length !== 1 ? 's' : ''} to "${tag}"` : '';
+    const removedMsg = removedKeys.length ? `Removed ${removedKeys.length} photo${removedKeys.length !== 1 ? 's' : ''} from "${tag}"` : '';
+    addToast(ok ? 'success' : 'error', ok ? [addedMsg, removedMsg].filter(Boolean).join(', ') || 'No changes' : 'Failed to update tags');
+    setTagPickerOpen(false);
+  };
+
+  const handleRemoveTagFromSelected = async () => {
+    if (!activeTag) return;
+    const keys = Array.from(selectedKeys);
+    const updated = photos.map((p) =>
+      keys.includes(p.key)
+        ? { ...p, meta: { ...p.meta, tags: (p.meta?.tags ?? []).filter((t) => t !== activeTag) } as PhotoMeta }
+        : p
+    );
+    setPhotos(updated);
+    const ok = await writeDataFile('photos.json', buildMetaMap(updated));
+    addToast(ok ? 'success' : 'error', ok ? `Removed "${activeTag}" from ${keys.length} photo${keys.length !== 1 ? 's' : ''}` : 'Failed to update tags');
+    setSelectedKeys(new Set());
+  };
+
+  const handleRenameTag = async (oldName: string, newName: string): Promise<boolean> => {
+    const name = newName.trim().toLowerCase();
+    if (!name) {
+      addToast('error', 'Tag name cannot be empty');
+      return false;
+    }
+    if (name === oldName) return true;
+    if (tags.some((t) => t.name === name)) {
+      addToast('error', `A tag named "${name}" already exists`);
+      return false;
+    }
+    const updated = photos.map((p) => {
+      const current = p.meta?.tags ?? [];
+      if (!current.includes(oldName)) return p;
+      return { ...p, meta: { ...p.meta, tags: current.map((t) => (t === oldName ? name : t)) } as PhotoMeta };
+    });
+    setPhotos(updated);
+    const ok = await writeDataFile('photos.json', buildMetaMap(updated));
+    addToast(ok ? 'success' : 'error', ok ? `Renamed "${oldName}" to "${name}"` : 'Failed to rename tag');
+    if (activeTag === oldName) setActiveTag(name);
+    return ok;
+  };
+
+  const handleDeleteTag = async (name: string) => {
+    const count = photos.filter((p) => p.meta?.tags?.includes(name)).length;
+    if (!window.confirm(`Delete tag "${name}" from ${count} photo${count !== 1 ? 's' : ''}?`)) return;
+    const updated = photos.map((p) => {
+      const current = p.meta?.tags ?? [];
+      if (!current.includes(name)) return p;
+      return { ...p, meta: { ...p.meta, tags: current.filter((t) => t !== name) } as PhotoMeta };
+    });
+    setPhotos(updated);
+    const ok = await writeDataFile('photos.json', buildMetaMap(updated));
+    addToast(ok ? 'success' : 'error', ok ? `Deleted tag "${name}"` : 'Failed to delete tag');
+    if (activeTag === name) setActiveTag(null);
+  };
+
   const handleDownloadBackup = async () => {
     try {
       addToast('info', 'Preparing backup...');
@@ -306,15 +389,26 @@ export default function AdminApp() {
     }
   };
 
-  const availableTags = useMemo(() => {
-    const set = new Set<string>();
-    for (const p of photos) if (p.meta?.tags) p.meta.tags.forEach((t) => set.add(t));
-    return Array.from(set).sort();
+  const tags = useMemo<TagSummary[]>(() => {
+    const counts = new Map<string, number>();
+    for (const p of photos) {
+      if (!p.meta?.tags) continue;
+      for (const t of p.meta.tags) counts.set(t, (counts.get(t) ?? 0) + 1);
+    }
+    return Array.from(counts.entries())
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => a.name.localeCompare(b.name));
   }, [photos]);
+
+  const availableTags = useMemo(() => tags.map((t) => t.name), [tags]);
 
   const collectionLabel = activeCollection && collections[activeCollection];
   const collectionPhotoCount = collectionLabel
     ? photos.filter((p) => collectionLabel.photos.includes(p.key)).length
+    : 0;
+
+  const tagPhotoCount = activeTag
+    ? photos.filter((p) => p.meta?.tags?.includes(activeTag)).length
     : 0;
 
   return (
@@ -323,8 +417,13 @@ export default function AdminApp() {
         collections={collections}
         activeCollection={activeCollection}
         activeFilter={activeFilter}
+        activeTag={activeTag}
+        tags={tags}
         onFilterChange={handleFilterChange}
         onSelectCollection={handleSelectCollection}
+        onSelectTag={handleSelectTag}
+        onRenameTag={handleRenameTag}
+        onDeleteTag={handleDeleteTag}
         onAddCollection={() => setEditingCollection('__new__')}
         onEditCollection={setEditingCollection}
         onDeleteCollection={handleDeleteCollection}
@@ -340,6 +439,30 @@ export default function AdminApp() {
           <div className="text-red-400 text-center py-8">{error}</div>
         ) : (
           <>
+            {activeTag && (
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => { setActiveTag(null); setSelectedKeys(new Set()); }}
+                    className="text-sm text-blue-400 hover:text-blue-300"
+                  >
+                    ← All Photos
+                  </button>
+                  <h2 className="text-lg font-semibold">
+                    #{activeTag}
+                    <span className="text-sm font-normal text-gray-400 ml-2">
+                      {tagPhotoCount} photo{tagPhotoCount !== 1 ? 's' : ''}
+                    </span>
+                  </h2>
+                </div>
+                <button
+                  onClick={() => setTagPickerOpen(true)}
+                  className="px-3 py-1.5 text-sm bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+                >
+                  Add photos
+                </button>
+              </div>
+            )}
             {collectionLabel && (
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-3">
@@ -387,6 +510,14 @@ export default function AdminApp() {
             >
               Clear
             </button>
+            {activeTag && (
+              <button
+                onClick={handleRemoveTagFromSelected}
+                className="px-4 py-1.5 text-sm bg-amber-600 hover:bg-amber-500 rounded-lg transition-colors"
+              >
+                Remove from #{activeTag}
+              </button>
+            )}
             <button
               onClick={handleBatchDelete}
               className="px-4 py-1.5 text-sm bg-red-600 hover:bg-red-500 rounded-lg transition-colors"
@@ -445,6 +576,15 @@ export default function AdminApp() {
           onBatchDelete={handleBatchDelete}
           onSaveReferenceList={handleSaveReferenceList}
           onClose={() => setBatchEditorOpen(false)}
+        />
+      )}
+
+      {tagPickerOpen && activeTag && (
+        <TagPicker
+          tag={activeTag}
+          photos={photos}
+          onSave={handleSaveTagMembers}
+          onClose={() => setTagPickerOpen(false)}
         />
       )}
 
