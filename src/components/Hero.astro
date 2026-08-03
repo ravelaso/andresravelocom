@@ -1,30 +1,21 @@
 ---
 export interface Props {
+  eyebrow: string;
   title: string;
   description?: string;
   class?: string;
 }
 
-const { title, description, class: className } = Astro.props;
-import InstagramLink from './InstagramLink.astro';
-import FilmStrip from './FilmStrip.astro';
---->
+const { eyebrow, title, description, class: className } = Astro.props;
+---
 
 <div class:list={["w-full relative", className]}>
   <div class="relative bg-ink-2 border-y border-line px-8 py-32 md:py-48 overflow-hidden">
 
-    <div class="absolute top-3 left-0 right-0">
-      <FilmStrip variant="bar" />
-    </div>
-
-    <div class="absolute bottom-3 left-0 right-0">
-      <FilmStrip variant="bar" />
-    </div>
-
     <div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgba(236,231,224,0.04) 0%, transparent 70%)"></div>
 
     <div class="max-w-5xl mx-auto text-center relative z-10">
-      <p class="text-sm md:text-base uppercase tracking-[0.3em] text-amber mb-6">Andres Ravelo</p>
+      <p class="text-sm md:text-base uppercase tracking-[0.3em] text-amber mb-6">{eyebrow}</p>
       <h1 class="text-5xl md:text-7xl lg:text-8xl font-extrabold text-paper leading-tight tracking-tight">
         {title}
       </h1>
@@ -33,8 +24,8 @@ import FilmStrip from './FilmStrip.astro';
           {description}
         </p>
       )}
-      <div class="mt-8 flex justify-center">
-        <InstagramLink />
+      <div class="mt-8 flex flex-col items-center gap-5">
+        <slot />
       </div>
     </div>
 

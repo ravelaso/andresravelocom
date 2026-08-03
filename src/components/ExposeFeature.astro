@@ -1,0 +1,60 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+type FeatureData = Extract<
+    CollectionEntry<"exposeFilm">["data"],
+    { type: "feature" }
+>;
+
+interface Props {
+    feature: FeatureData;
+}
+
+const { feature } = Astro.props;
+const { eyebrow, title, description, highlights, card, reversed } = feature;
+
+const renderHighlight = (text: string) =>
+    text.replace(/\*\*(.+?)\*\*/g, '<strong class="text-paper">$1</strong>');
+---
+
+<section class="py-48">
+    <div class="max-w-5xl mx-auto px-4 grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class:list={[reversed ? "md:order-2" : "", "space-y-6"]}>
+            <p class="text-xs tracking-[0.25em] uppercase text-muted mb-4">{eyebrow}</p>
+            <h2 class="text-5xl md:text-6xl font-bold text-paper">{title}</h2>
+            <p class="text-body text-lg leading-relaxed">{description}</p>
+
+            <div class="space-y-5 pt-2">
+                {highlights.map((highlight) => (
+                    <div class="flex items-start gap-3">
+                        <span class="text-amber flex-shrink-0 mt-1">✓</span>
+                        <p class="text-body leading-relaxed" set:html={renderHighlight(highlight)} />
+                    </div>
+                ))}
+            </div>
+        </div>
+
+        <div
+            class:list={[
+                reversed ? "md:order-1" : "",
+                "bg-surface/60 border border-line rounded-2xl p-8 lg:p-10 flex flex-col justify-center",
+            ]}
+        >
+            <div class="text-6xl mb-4 text-center">{card.icon}</div>
+            <p class="text-body text-sm text-center leading-relaxed">{card.caption}</p>
+            {card.stats && card.stats.length > 0 && (
+                <div class="mt-8 flex justify-center gap-6 text-center text-sm">
+                    {card.stats.map((stat, index) => (
+                        <>
+                            {index > 0 && <div class="w-px bg-line" />}
+                            <div>
+                                <p class="text-paper font-semibold text-lg">{stat.value}</p>
+                                <p class="text-muted">{stat.label}</p>
+                            </div>
+                        </>
+                    ))}
+                </div>
+            )}
+        </div>
+    </div>
+</section>

@@ -1,11 +1,12 @@
 ---
-import Layout from '@/layouts/Layout.astro';
-import NavBar from '@/components/NavBar';
-import FilmStripCard from '@/components/FilmStripCard.astro';
-import FilmStrip from '@/components/FilmStrip.astro';
-import RecentImages from '@/components/RecentImages.astro';
-import ExposeFilmSection from '@/components/ExposeFilmSection.astro';
-import ContactSection from '@/components/ContactSection.astro';
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/NavBar";
+import Hero from "@/components/Hero.astro";
+import FilmStrip from "@/components/FilmStrip.astro";
+import RecentImages from "@/components/RecentImages.astro";
+import ExposeFilmSection from "@/components/ExposeFilmSection.astro";
+import ContactSection from "@/components/ContactSection.astro";
+import InstagramLink from "@/components/InstagramLink.astro";
 import { getCollection } from "astro:content";
 
 export const prerender = false;
@@ -19,20 +20,27 @@ const about = aboutContent[0];
 
 <Layout title="Andres Ravelo — Film Photography">
     <NavBar client:only="react" />
+    <main>
+        <FilmStrip class="mt-8 md:mt-14" />
 
-    <FilmStripCard
-        class="mt-8 md:mt-10"
-        title={about.data.title}
-        description={about.data.description}
-    />
+        <Hero
+            eyebrow="Andres Ravelo"
+            title={about.data.title}
+            description={about.data.description}
+        >
+            <InstagramLink />
+        </Hero>
 
-    <RecentImages />
+        <FilmStrip />
 
-    <FilmStrip />
+        <RecentImages />
 
-    <ExposeFilmSection />
+        <FilmStrip />
 
-    <FilmStrip />
+        <ExposeFilmSection />
 
-    <ContactSection />
+        <FilmStrip />
+
+        <ContactSection />
+    </main>
 </Layout>

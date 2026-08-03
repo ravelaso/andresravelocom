@@ -56,6 +56,58 @@ const photographyCollection = defineCollection({
   }),
 });
 
+const exposeFilmCollection = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/expose-film' }),
+  schema: z.discriminatedUnion('type', [
+    z.object({
+      type: z.literal('hero'),
+      eyebrow: z.string(),
+      title: z.string(),
+      description: z.string(),
+      badges: z.array(z.string()),
+    }),
+    z.object({
+      type: z.literal('feature'),
+      eyebrow: z.string(),
+      title: z.string(),
+      description: z.string(),
+      highlights: z.array(z.string()),
+      card: z.object({
+        icon: z.string(),
+        caption: z.string(),
+        stats: z
+          .array(
+            z.object({
+              value: z.string(),
+              label: z.string(),
+            }),
+          )
+          .optional(),
+      }),
+      reversed: z.boolean().default(false),
+    }),
+    z.object({
+      type: z.literal('library'),
+      eyebrow: z.string(),
+      title: z.string(),
+      description: z.string(),
+      items: z.array(
+        z.object({
+          icon: z.string(),
+          title: z.string(),
+          description: z.string(),
+        }),
+      ),
+    }),
+    z.object({
+      type: z.literal('philosophy'),
+      title: z.string(),
+      text: z.string(),
+    }),
+  ]),
+});
+
 export const collections = {
   photography: photographyCollection,
+  exposeFilm: exposeFilmCollection,
 };
