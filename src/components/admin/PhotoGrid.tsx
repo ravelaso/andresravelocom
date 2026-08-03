@@ -1,34 +1,8 @@
-import React from 'react';
-
-interface PhotoMeta {
-  title: string;
-  description?: string;
-  tags: string[];
-  camera?: string;
-  lens?: string;
-  film?: string;
-  date?: string;
-  location?: string;
-  featured: boolean;
-  forSale: boolean;
-}
-
-interface AdminPhoto {
-  key: string;
-  url: string;
-  size: number;
-  lastModified: string;
-  meta: PhotoMeta | null;
-}
-
-interface Collection {
-  title: string;
-  photos: string[];
-}
+import type { AdminPhoto, PhotoCollection } from '@/types/admin';
 
 interface PhotoGridProps {
   photos: AdminPhoto[];
-  collections: Record<string, Collection>;
+  collections: Record<string, PhotoCollection>;
   selectedKeys: Set<string>;
   onSelect: (photo: AdminPhoto) => void;
   onToggleSelect: (key: string) => void;

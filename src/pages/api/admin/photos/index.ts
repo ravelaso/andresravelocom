@@ -1,6 +1,7 @@
 import type { APIRoute } from 'astro';
 import { env } from 'cloudflare:workers';
 import { requireDev } from '@/lib/admin-guard';
+import type { R2ListedPhoto } from '@/types/photos';
 
 export const GET: APIRoute = async () => {
   const guard = requireDev();
@@ -9,7 +10,7 @@ export const GET: APIRoute = async () => {
   try {
     const bucket = env.PHOTOGRAPHY;
 
-    const allPhotos: any[] = [];
+    const allPhotos: R2ListedPhoto[] = [];
     let cursor: string | undefined;
 
     do {

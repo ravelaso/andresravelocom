@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import type { AdminApiError } from '@/types/admin';
 
 interface UploadZoneProps {
   onDone: () => void;
@@ -41,7 +42,7 @@ export default function UploadZone({ onDone, onClose }: UploadZoneProps) {
         if (res.ok) {
           newResults.push({ name: file.name, status: 'done' });
         } else {
-          const err = await res.json();
+          const err = (await res.json()) as AdminApiError;
           newResults.push({ name: file.name, status: 'error', error: err.error });
         }
       } catch {

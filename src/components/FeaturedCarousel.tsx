@@ -9,8 +9,8 @@ interface FeaturedCarouselProps {
 const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClick }) => {
   return (
     <div className="px-5 pt-5">
-      <h2 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
-        <span className="text-amber-400">★</span>
+      <h2 className="text-lg font-semibold text-paper mb-3 flex items-center gap-2">
+        <span className="text-amber">★</span>
         Highlights
       </h2>
       <div
@@ -23,7 +23,7 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClic
             onClick={() => onImageClick(img)}
             className="snap-start shrink-0 w-48 group cursor-pointer text-left"
           >
-            <div className="overflow-hidden rounded-xl aspect-[3/2] bg-gray-800">
+            <div className="overflow-hidden rounded-xl aspect-[3/2] bg-surface-2">
               <img
                 src={img.url}
                 alt={img.title}
@@ -31,7 +31,9 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClic
                 loading="lazy"
               />
             </div>
-            <p className="text-sm text-gray-300 mt-1.5 truncate">{img.title}</p>
+            {img.title.trim() && (
+              <p className="text-sm text-body mt-1.5 truncate">{img.title}</p>
+            )}
           </button>
         ))}
       </div>

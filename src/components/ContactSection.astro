@@ -1,0 +1,113 @@
+---
+import Section from './Section.astro';
+import InstagramLink from './InstagramLink.astro';
+---
+
+<Section title="Get in Touch" description="Interested in a photoshoot or collaboration?">
+  <div slot="header" class="mt-8 flex justify-center">
+    <InstagramLink />
+  </div>
+
+  <div class="max-w-2xl mx-auto bg-surface/60 border border-line rounded-2xl p-8 lg:p-10" id="contact-form-container">
+    <form id="contact-form" class="space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-medium text-body mb-2">
+          Name
+        </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          required
+          class="w-full px-4 py-3 bg-ink-2 border border-line rounded-xl text-paper placeholder-faint focus:outline-none focus:ring-2 focus:ring-amber/20 focus:border-amber/50 transition"
+          placeholder="Your name"
+        />
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium text-body mb-2">
+          Email
+        </label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          required
+          class="w-full px-4 py-3 bg-ink-2 border border-line rounded-xl text-paper placeholder-faint focus:outline-none focus:ring-2 focus:ring-amber/20 focus:border-amber/50 transition"
+          placeholder="you@example.com"
+        />
+      </div>
+
+      <div>
+        <label for="message" class="block text-sm font-medium text-body mb-2">
+          Message
+        </label>
+        <textarea
+          id="message"
+          name="message"
+          rows={5}
+          required
+          class="w-full px-4 py-3 bg-ink-2 border border-line rounded-xl text-paper placeholder-faint focus:outline-none focus:ring-2 focus:ring-amber/20 focus:border-amber/50 transition resize-none"
+          placeholder="Tell me about your project..."
+        ></textarea>
+      </div>
+
+      <div class="cf-turnstile flex justify-center" data-sitekey="0x4AAAAAAEB6wrmj0-D8DRzu" data-action="contact-form" data-theme="dark"></div>
+
+      <button
+        type="submit"
+        id="submit-btn"
+        class="w-full py-3 px-6 bg-paper text-ink font-semibold rounded-xl hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        Send Message
+      </button>
+    </form>
+  </div>
+</Section>
+
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
+<script>
+  document.getElementById('contact-form')?.addEventListener('submit', async function (e) {
+    e.preventDefault();
+    const btn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+    const token = document.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]')?.value;
+
+    if (!token) {
+      alert('Please complete the verification.');
+      return;
+    }
+
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    const form = e.target as HTMLFormElement;
+    const data = {
+      name: (form.elements.namedItem('name') as HTMLInputElement | null)?.value ?? '',
+      email: (form.elements.namedItem('email') as HTMLInputElement | null)?.value ?? '',
+      message: (form.elements.namedItem('message') as HTMLInputElement | null)?.value ?? '',
+      token,
+    };
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (res.ok) {
+        form.innerHTML = '<div class="text-center py-8"><p class="text-body text-lg">Thanks! I\'ll get back to you soon.</p></div>';
+      } else {
+        const err = (await res.json()) as { error?: string };
+        btn.disabled = false;
+        btn.textContent = 'Send Message';
+        alert(err.error || 'Something went wrong.');
+      }
+    } catch {
+      btn.disabled = false;
+      btn.textContent = 'Send Message';
+      alert('Network error. Please try again.');
+    }
+  });
+</script>

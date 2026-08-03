@@ -1,7 +1,7 @@
 import { z } from 'astro/zod';
 
 export const PhotoMetaSchema = z.object({
-  title: z.string(),
+  title: z.string().nullable(),
   description: z.string().optional(),
   tags: z.array(z.string()).default([]),
   camera: z.string().optional(),
@@ -22,3 +22,10 @@ export const CollectionSchema = z.object({
 
 export type PhotoMeta = z.infer<typeof PhotoMetaSchema>;
 export type PhotoCollection = z.infer<typeof CollectionSchema>;
+
+export interface R2ListedPhoto {
+    key: string;
+    url: string;
+    size: number;
+    lastModified: string;
+}

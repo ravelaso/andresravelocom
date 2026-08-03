@@ -24,12 +24,7 @@ export const POST: APIRoute = async ({ request }) => {
       httpMetadata: { contentType: file.type },
     });
 
-    const title = key
-      .replace(/\.[^.]+$/, '')
-      .replace(/[-_]/g, ' ')
-      .replace(/\b\w/g, (c) => c.toUpperCase());
-
-    return new Response(JSON.stringify({ key, title }), {
+    return new Response(JSON.stringify({ key }), {
       status: 201,
       headers: { 'Content-Type': 'application/json' },
     });

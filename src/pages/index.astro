@@ -1,8 +1,38 @@
 ---
-import HeroSection from '@/components/HeroSection';
 import Layout from '@/layouts/Layout.astro';
+import NavBar from '@/components/NavBar';
+import FilmStripCard from '@/components/FilmStripCard.astro';
+import FilmStrip from '@/components/FilmStrip.astro';
+import RecentImages from '@/components/RecentImages.astro';
+import ExposeFilmSection from '@/components/ExposeFilmSection.astro';
+import ContactSection from '@/components/ContactSection.astro';
+import { getCollection } from "astro:content";
+
+export const prerender = false;
+
+const aboutContent = await getCollection(
+    "photography",
+    (entry) => entry.data.type === "about",
+);
+const about = aboutContent[0];
 ---
 
-<Layout>
-    <HeroSection client:only="react"/>
+<Layout title="Andres Ravelo — Film Photography">
+    <NavBar client:only="react" />
+
+    <FilmStripCard
+        class="mt-8 md:mt-10"
+        title={about.data.title}
+        description={about.data.description}
+    />
+
+    <RecentImages />
+
+    <FilmStrip />
+
+    <ExposeFilmSection />
+
+    <FilmStrip />
+
+    <ContactSection />
 </Layout>

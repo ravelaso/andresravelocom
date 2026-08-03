@@ -1,0 +1,29 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/NavBar";
+import PhotoGallery from "@/components/PhotoGallery";
+import type { ApiResponseData } from "@/lib/useGallery";
+
+export const prerender = false;
+
+const initialData: ApiResponseData = {
+    images: [],
+    hasMore: false,
+    cursor: null,
+    total: 0,
+    tags: [],
+    collections: [],
+    featured: [],
+};
+---
+
+<Layout title="Gallery — Andres Ravelo">
+    <NavBar client:only="react" />
+
+    <div>
+        <h1 class="text-4xl md:text-5xl font-bold text-center text-paper pt-28 pb-2">Gallery</h1>
+        <p class="text-muted text-center mb-4 text-lg">All photos shot on film unless noted</p>
+    </div>
+
+    <PhotoGallery client:only="react" initialData={initialData} />
+</Layout>

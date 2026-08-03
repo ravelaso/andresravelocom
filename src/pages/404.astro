@@ -8,7 +8,7 @@ Astro.response.status = 404;
 <Layout title="404 — Not Found">
   <NavBar client:only="react" />
   <main class="min-h-[80vh] flex flex-col items-center justify-center text-center px-4">
-    <svg viewBox="0 0 120 90" class="w-24 h-auto mb-6 text-gray-600" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 120 90" class="w-24 h-auto mb-6 text-muted" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
       <rect x="12" y="28" width="96" height="52" rx="8" />
       <circle cx="60" cy="54" r="18" />
       <circle cx="60" cy="54" r="7" />
@@ -17,13 +17,13 @@ Astro.response.status = 404;
       <path d="M 48 70 L 54 58 L 64 62 L 72 48" stroke-width="3.5" />
       <line x1="72" y1="45" x2="76" y2="41" stroke-width="2.5" />
     </svg>
-    <h1 class="text-8xl font-extrabold text-white/60 select-none">404</h1>
-    <p class="text-xl text-gray-400 mt-4 max-w-md">
+    <h1 class="text-8xl font-extrabold text-paper/60 select-none">404</h1>
+    <p class="text-xl text-body mt-4 max-w-md">
       Frame not found. This roll must have been a dud.
     </p>
     <a
       href="/"
-      class="mt-8 px-6 py-3 bg-neutral-800 text-gray-200 rounded-xl border border-gray-700 hover:bg-neutral-700 transition"
+      class="mt-8 px-6 py-3 bg-surface-2 text-body rounded-xl border border-line hover:bg-muted/30 transition"
     >
       Back to the index
     </a>

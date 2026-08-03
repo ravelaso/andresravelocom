@@ -1,0 +1,34 @@
+---
+import Section from './Section.astro';
+import RecentImagesGrid from './RecentImagesGrid';
+
+export interface Props {
+  count?: number;
+  title?: string;
+  description?: string;
+  galleryHref?: string;
+}
+
+const {
+  count = 4,
+  title = "Recent Frames",
+  description = "A handful of frames from recent rolls",
+  galleryHref = "/gallery",
+} = Astro.props;
+---
+
+<Section title={title} description={description}>
+  <RecentImagesGrid client:only="react" count={count} galleryHref={galleryHref} />
+
+  <div class="text-center mt-12">
+    <a
+      href={galleryHref}
+      class="inline-flex items-center gap-2 px-8 py-4 bg-paper text-ink font-semibold rounded-xl hover:opacity-90 transition group"
+    >
+      View Full Gallery
+      <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+      </svg>
+    </a>
+  </div>
+</Section>
