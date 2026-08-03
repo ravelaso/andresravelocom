@@ -9,4 +9,4 @@ CONTACT_EMAIL=<you@example.com>
 RESEND_API_KEY=<re_xxxxxxxx>
 # Public sitekey, safe to commit (already in the frontend). Only needed to
 # silence wrangler's "missing required secrets" warning locally.
-PUBLIC_TURNSTILE_SITE_KEY=0x4AAAAAAEB6wrmj0-D8DRzu
+PUBLIC_TURNSTILE_SITE_KEY=your_site_key
