@@ -1,18 +1,11 @@
 import type { APIRoute } from 'astro';
 import { env } from "cloudflare:workers";
-import type { PhotoMeta } from '@/types/photo';
+import type { PhotoMeta, PhotoCollection, R2ListedPhoto } from '@/types/photos';
 import rawPhotosData from '@/data/photos.json';
 import rawCollectionsData from '@/data/collections.json';
 
-interface PhotoObject {
-    key: string;
-    url: string;
-    size: number;
-    lastModified: string;
-}
-
 // Cache for all photos - since bucket is not huge, we can cache this
-let cachedPhotos: PhotoObject[] | null = null;
+let cachedPhotos: R2ListedPhoto[] | null = null;
 let cacheTimestamp: number = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
@@ -35,7 +28,7 @@ export const GET: APIRoute = async ({ url }) => {
         if (!cachedPhotos || (now - cacheTimestamp) > CACHE_DURATION) {
             console.log('Fetching all photos from R2...');
 
-            const allPhotos: PhotoObject[] = [];
+            const allPhotos: R2ListedPhoto[] = [];
             let cursor: string | undefined;
 
             do {
@@ -47,11 +40,11 @@ export const GET: APIRoute = async ({ url }) => {
 
                 if (listResult.objects) {
                     const batchPhotos = listResult.objects
-                        .filter((obj: any) => {
+                        .filter((obj: R2Object) => {
                             const ext = obj.key.toLowerCase().split('.').pop();
                             return ['jpg', 'jpeg', 'png', 'gif', 'webp', 'avif'].includes(ext || '');
                         })
-                        .map((obj: any) => ({
+                        .map((obj: R2Object) => ({
                             key: obj.key,
                             url: `/api/photos/${encodeURIComponent(obj.key)}`,
                             size: obj.size,
@@ -76,7 +69,7 @@ export const GET: APIRoute = async ({ url }) => {
 
         const allMeta = rawPhotosData as Record<string, PhotoMeta>;
         const metadataMap = new Map<string, PhotoMeta>(Object.entries(allMeta));
-        const collectionsData = rawCollectionsData as Record<string, { title: string; description?: string; coverPhoto?: string; photos: string[] }>;
+        const collectionsData = rawCollectionsData as Record<string, PhotoCollection>;
 
         const tagFilters = searchParams.getAll('tag');
         const collectionFilter = searchParams.get('collection') || null;
@@ -93,7 +86,7 @@ export const GET: APIRoute = async ({ url }) => {
             filteredPhotos = filteredPhotos.filter(p => colSet.has(p.key));
         }
 
-        function enrich(p: PhotoObject) {
+        function enrich(p: R2ListedPhoto) {
             const meta = metadataMap.get(p.key);
             return {
                 ...p,

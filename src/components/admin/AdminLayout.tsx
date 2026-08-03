@@ -1,15 +1,9 @@
 import React from 'react';
 import CollectionManager from './CollectionManager';
-
-interface Collection {
-  title: string;
-  description?: string;
-  coverPhoto?: string;
-  photos: string[];
-}
+import type { PhotoCollection } from '@/types/admin';
 
 interface AdminLayoutProps {
-  collections: Record<string, Collection>;
+  collections: Record<string, PhotoCollection>;
   activeCollection: string | null;
   activeFilter: 'all' | 'featured' | 'untagged';
   onFilterChange: (f: 'all' | 'featured' | 'untagged') => void;

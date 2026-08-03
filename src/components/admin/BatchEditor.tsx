@@ -1,23 +1,20 @@
 import React, { useState } from 'react';
+import type { PhotoMeta, ReferenceList } from '@/types/admin';
 
-interface BatchPhotoMeta {
-  tags: string[];
-  camera?: string;
-  lens?: string;
-  film?: string;
-}
+type BatchPhotoMeta = Partial<Pick<PhotoMeta, 'tags' | 'camera' | 'lens' | 'film'>>;
 
 interface BatchEditorProps {
   count: number;
-  cameras: { name: string }[];
-  lenses: { name: string }[];
+  cameras: ReferenceList;
+  lenses: ReferenceList;
   availableTags: string[];
   onApply: (data: Partial<BatchPhotoMeta>) => void;
   onBatchDelete: () => void;
+  onSaveReferenceList: (list: 'cameras' | 'lenses', data: ReferenceList) => void;
   onClose: () => void;
 }
 
-export default function BatchEditor({ count, cameras, lenses, availableTags, onApply, onBatchDelete, onClose }: BatchEditorProps) {
+export default function BatchEditor({ count, cameras, lenses, availableTags, onApply, onBatchDelete, onSaveReferenceList, onClose }: BatchEditorProps) {
   const [camera, setCamera] = useState('');
   const [lens, setLens] = useState('');
   const [film, setFilm] = useState('');
@@ -57,11 +54,12 @@ export default function BatchEditor({ count, cameras, lenses, availableTags, onA
     else if (!replaceTags) data.tags = [];
 
     if (camera && !cameraNames.includes(camera)) {
-      const updated = [...cameras, { name: camera }];
-      onApply(data);
-    } else {
-      onApply(data);
+      onSaveReferenceList('cameras', [...cameras, { name: camera }]);
     }
+    if (lens && !lensNames.includes(lens)) {
+      onSaveReferenceList('lenses', [...lenses, { name: lens }]);
+    }
+    onApply(data);
   };
 
   const hasAnyValue = camera || lens || film || tags.length > 0;

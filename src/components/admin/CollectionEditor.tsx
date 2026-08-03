@@ -1,28 +1,11 @@
-import React, { useState } from 'react';
-
-interface PhotoMeta {
-  title: string | null;
-  [key: string]: any;
-}
-
-interface AdminPhoto {
-  key: string;
-  url: string;
-  meta: PhotoMeta | null;
-}
-
-interface Collection {
-  title: string;
-  description?: string;
-  coverPhoto?: string;
-  photos: string[];
-}
+import { useState } from 'react';
+import type { AdminPhoto, PhotoCollection } from '@/types/admin';
 
 interface CollectionEditorProps {
   slug: string | null;
-  data: Collection | null;
+  data: PhotoCollection | null;
   photos: AdminPhoto[];
-  onSave: (slug: string, data: Collection) => Promise<void>;
+  onSave: (slug: string, data: PhotoCollection) => Promise<void>;
   onClose: () => void;
 }
 

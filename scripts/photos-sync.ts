@@ -12,7 +12,7 @@ async function main() {
     process.exit(1);
   }
 
-  const { photos } = await response.json();
+  const { photos } = (await response.json()) as { photos: unknown[] };
   console.log(`Found ${photos.length} photos in R2`);
 }
 

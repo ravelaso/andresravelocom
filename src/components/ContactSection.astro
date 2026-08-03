@@ -65,12 +65,13 @@ import InstagramLink from './InstagramLink.astro';
   </div>
 </Section>
 
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer is:inline></script>
 <script>
   document.getElementById('contact-form')?.addEventListener('submit', async function (e) {
     e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
+    const btn = document.getElementById('submit-btn') as HTMLButtonElement | null;
+    if (!btn) return;
+    const token = document.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]')?.value;
 
     if (!token) {
       alert('Please complete the verification.');
@@ -80,11 +81,11 @@ import InstagramLink from './InstagramLink.astro';
     btn.disabled = true;
     btn.textContent = 'Sending...';
 
-    const form = e.target;
+    const form = e.target as HTMLFormElement;
     const data = {
-      name: form.name.value,
-      email: form.email.value,
-      message: form.message.value,
+      name: (form.elements.namedItem('name') as HTMLInputElement | null)?.value ?? '',
+      email: (form.elements.namedItem('email') as HTMLInputElement | null)?.value ?? '',
+      message: (form.elements.namedItem('message') as HTMLInputElement | null)?.value ?? '',
       token,
     };
 
@@ -98,7 +99,7 @@ import InstagramLink from './InstagramLink.astro';
       if (res.ok) {
         form.innerHTML = '<div class="text-center py-8"><p class="text-body text-lg">Thanks! I\'ll get back to you soon.</p></div>';
       } else {
-        const err = await res.json();
+        const err = (await res.json()) as { error?: string };
         btn.disabled = false;
         btn.textContent = 'Send Message';
         alert(err.error || 'Something went wrong.');

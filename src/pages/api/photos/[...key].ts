@@ -21,10 +21,7 @@ export const GET: APIRoute = async ({ params }) => {
         const headers = new Headers();
         headers.set('Content-Type', object.httpMetadata?.contentType || 'application/octet-stream');
         headers.set('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
-
-        if (object.httpMetadata?.contentLength) {
-            headers.set('Content-Length', object.httpMetadata.contentLength.toString());
-        }
+        headers.set('Content-Length', object.size.toString());
 
         return new Response(object.body, {
             headers

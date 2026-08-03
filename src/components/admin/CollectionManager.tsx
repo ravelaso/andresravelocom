@@ -1,14 +1,7 @@
-import React from 'react';
-
-interface Collection {
-  title: string;
-  description?: string;
-  coverPhoto?: string;
-  photos: string[];
-}
+import type { PhotoCollection } from '@/types/admin';
 
 interface CollectionManagerProps {
-  collections: Record<string, Collection>;
+  collections: Record<string, PhotoCollection>;
   activeCollection: string | null;
   onSelect: (slug: string) => void;
   onAdd: () => void;

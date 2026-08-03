@@ -20,11 +20,10 @@
 		  "remote": true
 	  }
 	],
-
-	"vars": {
-		"PUBLIC_TURNSTILE_SITE_KEY": "0x4AAAAAAEB6wrmj0-D8DRzu",
-		"CONTACT_EMAIL": "me@andresravelo.com"
+	"secrets":{
+		"required": ["CONTACT_EMAIL", "PUBLIC_TURNSTILE_SITE_KEY", "RESEND_API_KEY", "TURNSTILE_SECRET_KEY"]
 	}
+	
 	/**
 	 * Note: Use secrets to store sensitive data.
 	 * https://developers.cloudflare.com/workers/configuration/secrets/

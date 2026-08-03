@@ -11,9 +11,8 @@
     "types": [
       "node"
     ],
-    "baseUrl": ".", // This should usually be the root of your project
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
     "jsx": "react-jsx",
     "jsxImportSource": "react"

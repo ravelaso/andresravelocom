@@ -22,3 +22,10 @@ export const CollectionSchema = z.object({
 
 export type PhotoMeta = z.infer<typeof PhotoMetaSchema>;
 export type PhotoCollection = z.infer<typeof CollectionSchema>;
+
+export interface R2ListedPhoto {
+    key: string;
+    url: string;
+    size: number;
+    lastModified: string;
+}

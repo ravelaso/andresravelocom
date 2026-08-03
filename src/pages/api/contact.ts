@@ -1,11 +1,12 @@
 import type { APIRoute } from 'astro';
 import { env } from "cloudflare:workers";
+import type { ContactPayload, TurnstileResult } from '@/types/contact';
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request }) => {
     try {
-        const { name, email, message, token } = await request.json();
+        const { name, email, message, token } = (await request.json()) as ContactPayload;
 
         if (!name || !email || !message || !token) {
             return new Response(JSON.stringify({ error: "All fields are required" }), {
@@ -25,7 +26,7 @@ export const POST: APIRoute = async ({ request }) => {
                 }),
             }
         );
-        const turnstileResult = await turnstile.json();
+        const turnstileResult = (await turnstile.json()) as TurnstileResult;
 
         if (!turnstileResult.success) {
             return new Response(JSON.stringify({ error: "Verification failed. Please try again." }), {

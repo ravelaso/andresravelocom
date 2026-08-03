@@ -1,47 +1,12 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import AdminLayout from './AdminLayout';
 import PhotoGrid from './PhotoGrid';
 import PhotoEditor from './PhotoEditor';
 import UploadZone from './UploadZone';
-import CollectionManager from './CollectionManager';
 import CollectionEditor from './CollectionEditor';
 import BatchEditor from './BatchEditor';
 import NotificationToast, { useToast } from './NotificationToast';
-
-interface PhotoMeta {
-  title: string | null;
-  description?: string;
-  tags: string[];
-  camera?: string;
-  lens?: string;
-  film?: string;
-  date?: string;
-  location?: string;
-  featured: boolean;
-  forSale: boolean;
-}
-
-interface AdminPhoto {
-  key: string;
-  url: string;
-  size: number;
-  lastModified: string;
-  meta: PhotoMeta | null;
-}
-
-interface Collection {
-  title: string;
-  description?: string;
-  coverPhoto?: string;
-  photos: string[];
-}
-
-function keyToTitle(key: string): string {
-  const name = key.split('/').pop()?.replace(/\.[^.]+$/, '') ?? key;
-  return name
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase());
-}
+import type { AdminPhoto, AdminPhotosResponse, AdminApiError, PhotoMeta, PhotoCollection, ReferenceList } from '@/types/admin';
 
 function buildMetaMap(photos: AdminPhoto[]): Record<string, PhotoMeta> {
   const map: Record<string, PhotoMeta> = {};
@@ -51,7 +16,7 @@ function buildMetaMap(photos: AdminPhoto[]): Record<string, PhotoMeta> {
   return map;
 }
 
-async function readDataFile(file: string): Promise<any> {
+async function readDataFile<T>(file: string): Promise<T | Record<string, never>> {
   try {
     const res = await fetch(`/_admin-io/read?file=${file}`);
     if (!res.ok) return {};
@@ -61,7 +26,7 @@ async function readDataFile(file: string): Promise<any> {
   }
 }
 
-async function writeDataFile(file: string, data: any): Promise<boolean> {
+async function writeDataFile(file: string, data: unknown): Promise<boolean> {
   try {
     const res = await fetch('/_admin-io/write', {
       method: 'POST',
@@ -77,9 +42,9 @@ async function writeDataFile(file: string, data: any): Promise<boolean> {
 export default function AdminApp() {
   const { toasts, addToast, dismissToast } = useToast();
   const [photos, setPhotos] = useState<AdminPhoto[]>([]);
-  const [collections, setCollections] = useState<Record<string, Collection>>({});
-  const [cameras, setCameras] = useState<{ name: string }[]>([]);
-  const [lenses, setLenses] = useState<{ name: string }[]>([]);
+  const [collections, setCollections] = useState<Record<string, PhotoCollection>>({});
+  const [cameras, setCameras] = useState<ReferenceList>([]);
+  const [lenses, setLenses] = useState<ReferenceList>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<AdminPhoto | null>(null);
@@ -96,10 +61,10 @@ export default function AdminApp() {
 
     const [photosRes, metaData, collectionsData, camerasData, lensesData] = await Promise.all([
       fetch('/api/admin/photos'),
-      readDataFile('photos.json'),
-      readDataFile('collections.json'),
-      readDataFile('cameras.json'),
-      readDataFile('lenses.json'),
+      readDataFile<Record<string, PhotoMeta>>('photos.json'),
+      readDataFile<Record<string, PhotoCollection>>('collections.json'),
+      readDataFile<ReferenceList>('cameras.json'),
+      readDataFile<ReferenceList>('lenses.json'),
     ]);
 
     if (!photosRes.ok) {
@@ -109,10 +74,12 @@ export default function AdminApp() {
       }
     }
 
-    const r2Photos = photosRes.ok ? (await photosRes.json()).photos : [];
+    const r2Photos = photosRes.ok
+      ? ((await photosRes.json()) as AdminPhotosResponse).photos
+      : [];
     const existingMeta: Record<string, PhotoMeta> = metaData;
 
-    const merged: AdminPhoto[] = r2Photos.map((p: any) => ({
+    const merged: AdminPhoto[] = r2Photos.map((p) => ({
       key: p.key,
       url: p.url,
       size: p.size,
@@ -182,7 +149,7 @@ export default function AdminApp() {
       method: 'DELETE',
     });
     if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
+      const body = (await res.json().catch(() => ({}))) as AdminApiError;
       addToast('error', body.error || 'Failed to delete photo from R2');
       return;
     }
@@ -190,7 +157,7 @@ export default function AdminApp() {
     const updated = photos.filter((p) => p.key !== key);
     setPhotos(updated);
 
-    const updatedCollections: Record<string, Collection> = {};
+    const updatedCollections: Record<string, PhotoCollection> = {};
     for (const slug of Object.keys(collections)) {
       const c = { ...collections[slug] };
       c.photos = c.photos.filter((k) => k !== key);
@@ -206,7 +173,7 @@ export default function AdminApp() {
     setSelectedPhoto(null);
   };
 
-  const handleSaveCollection = async (slug: string, data: Collection) => {
+  const handleSaveCollection = async (slug: string, data: PhotoCollection) => {
     if (editingCollection === '__new__' && collections[slug]) {
       addToast('error', 'A collection with this slug already exists');
       return;
@@ -221,7 +188,7 @@ export default function AdminApp() {
   const handleToggleCollection = async (slug: string, add: boolean) => {
     if (!selectedPhoto) return;
     const key = selectedPhoto.key;
-    const updated: Record<string, Collection> = {};
+    const updated: Record<string, PhotoCollection> = {};
     for (const s of Object.keys(collections)) {
       updated[s] = { ...collections[s] };
       if (s === slug) {
@@ -238,7 +205,7 @@ export default function AdminApp() {
 
   const handleDeleteCollection = async (slug: string) => {
     if (slug === activeCollection) setActiveCollection(null);
-    const updated: Record<string, Collection> = {};
+    const updated: Record<string, PhotoCollection> = {};
     for (const key of Object.keys(collections)) {
       if (key !== slug) updated[key] = collections[key];
     }
@@ -246,7 +213,7 @@ export default function AdminApp() {
     await writeDataFile('collections.json', updated);
   };
 
-  const handleSaveReferenceList = async (list: 'cameras' | 'lenses', data: { name: string }[]) => {
+  const handleSaveReferenceList = async (list: 'cameras' | 'lenses', data: ReferenceList) => {
     if (list === 'cameras') setCameras(data);
     else setLenses(data);
     const ok = await writeDataFile(`${list}.json`, data);
@@ -296,7 +263,7 @@ export default function AdminApp() {
     const remaining = photos.filter((p) => !succeeded.includes(p.key));
     setPhotos(remaining);
 
-    const updatedCollections: Record<string, Collection> = {};
+    const updatedCollections: Record<string, PhotoCollection> = {};
     for (const slug of Object.keys(collections)) {
       const c = { ...collections[slug] };
       c.photos = c.photos.filter((k) => !succeeded.includes(k));
@@ -476,6 +443,7 @@ export default function AdminApp() {
           availableTags={availableTags}
           onApply={handleBatchApply}
           onBatchDelete={handleBatchDelete}
+          onSaveReferenceList={handleSaveReferenceList}
           onClose={() => setBatchEditorOpen(false)}
         />
       )}

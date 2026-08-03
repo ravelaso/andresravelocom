@@ -1,39 +1,16 @@
 import React, { useState } from 'react';
-
-interface PhotoMeta {
-  title: string | null;
-  description?: string;
-  tags: string[];
-  camera?: string;
-  lens?: string;
-  film?: string;
-  date?: string;
-  location?: string;
-  featured: boolean;
-  forSale: boolean;
-}
-
-interface AdminPhoto {
-  key: string;
-  url: string;
-  meta: PhotoMeta | null;
-}
-
-interface Collection {
-  title: string;
-  photos: string[];
-}
+import type { PhotoMeta, AdminPhoto, PhotoCollection, ReferenceList } from '@/types/admin';
 
 interface PhotoEditorProps {
   photo: AdminPhoto;
-  collections: Record<string, Collection>;
-  cameras: { name: string }[];
-  lenses: { name: string }[];
+  collections: Record<string, PhotoCollection>;
+  cameras: ReferenceList;
+  lenses: ReferenceList;
   availableTags: string[];
   onSave: (key: string, data: Partial<PhotoMeta>) => Promise<void>;
   onDelete: (key: string) => Promise<void>;
   onToggleCollection: (slug: string, add: boolean) => void;
-  onSaveReferenceList: (list: 'cameras' | 'lenses', data: { name: string }[]) => void;
+  onSaveReferenceList: (list: 'cameras' | 'lenses', data: ReferenceList) => void;
   onClose: () => void;
 }
 
@@ -212,7 +189,7 @@ export default function PhotoEditor({
                 </div>
               ) : (
                 <select
-                  value={cameraNames.includes(form.camera) ? form.camera : isNewCamera ? '__custom' : ''}
+                  value={cameraNames.includes(form.camera ?? '') ? form.camera : isNewCamera ? '__custom' : ''}
                   onChange={(e) => handleCameraSelect(e.target.value)}
                   className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
                 >
@@ -254,7 +231,7 @@ export default function PhotoEditor({
                 </div>
               ) : (
                 <select
-                  value={lensNames.includes(form.lens) ? form.lens : isNewLens ? '__custom' : ''}
+                  value={lensNames.includes(form.lens ?? '') ? form.lens : isNewLens ? '__custom' : ''}
                   onChange={(e) => handleLensSelect(e.target.value)}
                   className="w-full bg-neutral-800 border border-gray-700 rounded-lg px-3 py-2 text-sm"
                 >

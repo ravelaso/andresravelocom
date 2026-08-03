@@ -52,7 +52,7 @@ export const GET: APIRoute = async (ctx) => {
 
     const zip = buildZip([...imageEntries, ...metaEntries]);
 
-    return new Response(zip, {
+    return new Response(new Blob([zip.buffer as ArrayBuffer]), {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="backup-${new Date().toISOString().slice(0, 10)}.zip"`,
