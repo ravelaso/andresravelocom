@@ -19,4 +19,9 @@ export interface AdminApiError {
 
 export type ReferenceList = { name: string }[];
 
+export interface TagSummary {
+  name: string;
+  count: number;
+}
+
 export type { PhotoMeta, PhotoCollection, R2ListedPhoto };

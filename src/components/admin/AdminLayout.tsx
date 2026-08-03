@@ -1,13 +1,19 @@
 import React from 'react';
 import CollectionManager from './CollectionManager';
-import type { PhotoCollection } from '@/types/admin';
+import TagManager from './TagManager';
+import type { PhotoCollection, TagSummary } from '@/types/admin';
 
 interface AdminLayoutProps {
   collections: Record<string, PhotoCollection>;
   activeCollection: string | null;
   activeFilter: 'all' | 'featured' | 'untagged';
+  activeTag: string | null;
+  tags: TagSummary[];
   onFilterChange: (f: 'all' | 'featured' | 'untagged') => void;
   onSelectCollection: (slug: string | null) => void;
+  onSelectTag: (tag: string) => void;
+  onRenameTag: (oldName: string, newName: string) => Promise<boolean>;
+  onDeleteTag: (name: string) => void;
   onAddCollection: () => void;
   onEditCollection: (slug: string) => void;
   onDeleteCollection: (slug: string) => void;
@@ -20,8 +26,13 @@ export default function AdminLayout({
   collections,
   activeCollection,
   activeFilter,
+  activeTag,
+  tags,
   onFilterChange,
   onSelectCollection,
+  onSelectTag,
+  onRenameTag,
+  onDeleteTag,
   onAddCollection,
   onEditCollection,
   onDeleteCollection,
@@ -54,7 +65,7 @@ export default function AdminLayout({
           <nav className="space-y-1 mb-6">
             <FilterButton
               label="All"
-              active={activeFilter === 'all' && !activeCollection}
+              active={activeFilter === 'all' && !activeCollection && !activeTag}
               onClick={() => { onSelectCollection(null); onFilterChange('all'); }}
             />
             <FilterButton
@@ -77,6 +88,16 @@ export default function AdminLayout({
               onAdd={onAddCollection}
               onEdit={onEditCollection}
               onDelete={onDeleteCollection}
+            />
+          </div>
+
+          <div className="border-t border-gray-800 pt-4">
+            <TagManager
+              tags={tags}
+              activeTag={activeTag}
+              onSelect={onSelectTag}
+              onRename={onRenameTag}
+              onDelete={onDeleteTag}
             />
           </div>
         </aside>
