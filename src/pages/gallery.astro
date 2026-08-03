@@ -6,7 +6,7 @@ import type { ApiResponseData } from "@/lib/useGallery";
 
 export const prerender = false;
 
-let initialData: ApiResponseData = {
+const initialData: ApiResponseData = {
     images: [],
     hasMore: false,
     cursor: null,
@@ -15,15 +15,6 @@ let initialData: ApiResponseData = {
     collections: [],
     featured: [],
 };
-
-try {
-    const response = await fetch(new URL("/api/photos?limit=12", Astro.url));
-    if (response.ok) {
-        initialData = await response.json();
-    }
-} catch (error) {
-    console.error("Error loading initial images:", error);
-}
 ---
 
 <Layout title="Gallery — Andres Ravelo">

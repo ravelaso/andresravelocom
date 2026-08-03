@@ -1,9 +1,9 @@
 ---
 import Section from './Section.astro';
+import RecentImagesGrid from './RecentImagesGrid';
 
 export interface Props {
   count?: number;
-  images?: { url: string; title: string }[];
   title?: string;
   description?: string;
   galleryHref?: string;
@@ -11,44 +11,14 @@ export interface Props {
 
 const {
   count = 4,
-  images: propImages,
   title = "Recent Frames",
   description = "A handful of frames from recent rolls",
   galleryHref = "/gallery",
 } = Astro.props;
-
-let images = propImages ?? [];
-if (!images.length) {
-  try {
-    const response = await fetch(new URL("/api/photos?limit=10", Astro.url));
-    if (response.ok) {
-      const data = await response.json();
-      images = data.featured?.length ? data.featured.slice(0, count) : data.images?.slice(0, count) || [];
-    }
-  } catch (error) {
-    console.error("Error loading preview images:", error);
-  }
-}
 ---
 
 <Section title={title} description={description}>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 px-4 md:px-24 lg:px-32">
-    {
-      images.map((img) => (
-        <a
-          href={galleryHref}
-          class="group block overflow-hidden rounded-xl bg-surface-2 aspect-[3/2]"
-        >
-          <img
-            src={img.url}
-            alt={img.title}
-            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            loading="lazy"
-          />
-        </a>
-      ))
-    }
-  </div>
+  <RecentImagesGrid client:only="react" count={count} galleryHref={galleryHref} />
 
   <div class="text-center mt-12">
     <a
