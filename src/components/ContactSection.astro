@@ -78,6 +78,10 @@ import InstagramLink from './InstagramLink.astro';
       return;
     }
 
+    // Tokens are single-use; reset the widget so a retry submits a fresh
+    // token instead of the redeemed one being rejected as timeout-or-duplicate.
+    setTimeout(() => window.turnstile?.reset(), 0);
+
     btn.disabled = true;
     btn.textContent = 'Sending...';
 

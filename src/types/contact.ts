@@ -7,4 +7,5 @@ export interface ContactPayload {
 
 export interface TurnstileResult {
   success: boolean;
+  "error-codes"?: string[];
 }
