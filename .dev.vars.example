@@ -1,0 +1,12 @@
+# Local development secrets for the Cloudflare Worker.
+# Copy this file to `.dev.vars` and fill in the real values.
+# `.dev.vars` is gitignored — never commit real values.
+#
+# TURNSTILE_SECRET_KEY: from your Turnstile widget in the Cloudflare dashboard
+#   (Dashboard -> Turnstile -> form-captcha -> Secret).
+TURNSTILE_SECRET_KEY=<widget-secret-from-dashboard>
+CONTACT_EMAIL=<you@example.com>
+RESEND_API_KEY=<re_xxxxxxxx>
+# Public sitekey, safe to commit (already in the frontend). Only needed to
+# silence wrangler's "missing required secrets" warning locally.
+PUBLIC_TURNSTILE_SITE_KEY=your_site_key

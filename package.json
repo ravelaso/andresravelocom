@@ -1,7 +1,7 @@
 {
 	"name": "andresravelocom",
 	"type": "module",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"scripts": {
 		"dev": "astro dev --env development",
 		"build": "astro build",

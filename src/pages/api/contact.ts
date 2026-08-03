@@ -15,22 +15,45 @@ export const POST: APIRoute = async ({ request }) => {
             });
         }
 
-        const turnstile = await fetch(
-            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
-            {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    secret: env.TURNSTILE_SECRET_KEY,
-                    response: token,
-                }),
+        // Canonical server-side Turnstile validation. Tokens are single-use;
+        // a replayed token is rejected with timeout-or-duplicate.
+        let turnstileResult: TurnstileResult;
+        try {
+            const clientIp =
+                request.headers.get("CF-Connecting-IP") ??
+                request.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() ??
+                undefined;
+
+            const turnstile = await fetch(
+                "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        secret: env.TURNSTILE_SECRET_KEY,
+                        response: token,
+                        ...(clientIp ? { remoteip: clientIp } : {}),
+                    }),
+                }
+            );
+
+            if (!turnstile.ok) {
+                throw new Error(`siteverify returned HTTP ${turnstile.status}`);
             }
-        );
-        const turnstileResult = (await turnstile.json()) as TurnstileResult;
+            turnstileResult = (await turnstile.json()) as TurnstileResult;
+        } catch (err) {
+            // Network error, non-2xx, or non-JSON body from siteverify. Fail closed.
+            console.error("Turnstile siteverify error:", err);
+            return new Response(JSON.stringify({ error: "Something went wrong" }), {
+                status: 403,
+                headers: { "Content-Type": "application/json" },
+            });
+        }
 
         if (!turnstileResult.success) {
+            console.error("Turnstile validation failed:", turnstileResult["error-codes"]);
             return new Response(JSON.stringify({ error: "Verification failed. Please try again." }), {
-                status: 400,
+                status: 403,
                 headers: { "Content-Type": "application/json" },
             });
         }
