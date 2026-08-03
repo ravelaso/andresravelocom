@@ -9,7 +9,7 @@ import BatchEditor from './BatchEditor';
 import NotificationToast, { useToast } from './NotificationToast';
 
 interface PhotoMeta {
-  title: string;
+  title: string | null;
   description?: string;
   tags: string[];
   camera?: string;
@@ -124,7 +124,7 @@ export default function AdminApp() {
     if (needMeta.length > 0) {
       for (const p of needMeta) {
         existingMeta[p.key] = {
-          title: '',
+          title: null,
           tags: [],
           featured: false,
           forSale: false,

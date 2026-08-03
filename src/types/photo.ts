@@ -1,7 +1,7 @@
 import { z } from 'astro/zod';
 
 export const PhotoMetaSchema = z.object({
-  title: z.string(),
+  title: z.string().nullable(),
   description: z.string().optional(),
   tags: z.array(z.string()).default([]),
   camera: z.string().optional(),

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 
 interface PhotoMeta {
-  title: string;
+  title: string | null;
   [key: string]: any;
 }
 

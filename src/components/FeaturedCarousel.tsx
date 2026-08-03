@@ -31,7 +31,9 @@ const FeaturedCarousel: React.FC<FeaturedCarouselProps> = ({ images, onImageClic
                 loading="lazy"
               />
             </div>
-            <p className="text-sm text-gray-300 mt-1.5 truncate">{img.title}</p>
+            {img.title.trim() && (
+              <p className="text-sm text-gray-300 mt-1.5 truncate">{img.title}</p>
+            )}
           </button>
         ))}
       </div>

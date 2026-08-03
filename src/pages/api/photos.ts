@@ -97,7 +97,7 @@ export const GET: APIRoute = async ({ url }) => {
             const meta = metadataMap.get(p.key);
             return {
                 ...p,
-                title: meta?.title ?? p.key,
+                title: meta?.title ?? '',
                 description: meta?.description,
                 tags: meta?.tags ?? [],
                 camera: meta?.camera,

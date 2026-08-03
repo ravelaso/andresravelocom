@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface PhotoMeta {
-  title: string;
+  title: string | null;
   description?: string;
   tags: string[];
   camera?: string;

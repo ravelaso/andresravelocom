@@ -11,7 +11,9 @@ const PhotoModalMetadata: React.FC<PhotoModalMetadataProps> = ({ image, index, t
   <div className="shrink-0 bg-black/80 border-t border-gray-800 px-6 py-4">
     <div className="flex items-start justify-between gap-4">
       <div className="min-w-0">
-        <h2 className="text-white font-semibold text-base truncate">{image.title}</h2>
+        {image.title.trim() && (
+          <h2 className="text-white font-semibold text-base truncate">{image.title}</h2>
+        )}
 
         <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-400 mt-1.5">
           {image.camera && <span>📷 {image.camera}</span>}
