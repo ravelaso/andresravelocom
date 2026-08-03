@@ -1,0 +1,23 @@
+---
+import Section from './Section.astro';
+---
+
+<Section
+  eyebrow="In Development"
+  title="Expose Film"
+  description="A film photography companion app for iOS and Android. Meter light, track frames across rolls, and keep a memorandum of every exposure. Built with Flutter."
+  descriptionClass="text-body text-lg max-w-2xl mx-auto mb-8 leading-relaxed"
+  headerClass="max-w-5xl mx-auto px-4 text-center"
+>
+  <div slot="header">
+    <a
+      href="/expose-film"
+      class="inline-flex items-center gap-2 text-body border-b border-line pb-0.5 hover:text-amber hover:border-amber transition-colors duration-200"
+    >
+      Learn more about the app
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+      </svg>
+    </a>
+  </div>
+</Section>

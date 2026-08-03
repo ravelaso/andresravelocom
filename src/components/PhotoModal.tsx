@@ -41,7 +41,7 @@ const PhotoModal: React.FC<PhotoModalProps> = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col" onClick={onClose}>
+    <div className="fixed inset-0 bg-ink z-50 flex flex-col" onClick={onClose}>
       <div className="flex-1 flex items-center justify-center p-4 min-h-0">
         <img
           src={image.url}
@@ -52,7 +52,7 @@ const PhotoModal: React.FC<PhotoModalProps> = ({
         />
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="w-12 h-12 border-4 border-white border-t-blue-500 rounded-full animate-spin" />
+            <div className="w-12 h-12 border-4 border-paper border-t-amber rounded-full animate-spin" />
           </div>
         )}
       </div>

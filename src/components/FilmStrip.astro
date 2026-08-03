@@ -1,0 +1,25 @@
+---
+interface Props {
+  variant?: 'bar' | 'divider';
+  class?: string;
+}
+
+const { variant = 'divider', class: className } = Astro.props;
+const sprocketStyle =
+  'background: repeating-linear-gradient(90deg, transparent 0px, transparent 22px, #4d4a45 22px, #4d4a45 42px, transparent 42px, transparent 64px)';
+---
+
+{
+  variant === 'bar' && (
+    <div aria-hidden="true" class:list={["h-3 w-full", className]} style={sprocketStyle} />
+  )
+}
+
+{
+  variant === 'divider' && (
+    <div aria-hidden="true" class:list={["relative w-full h-12 bg-ink-2 border-y border-line overflow-hidden", className]}>
+      <div class="absolute top-3 left-0 right-0 h-3" style={sprocketStyle} />
+      <div class="absolute bottom-3 left-0 right-0 h-3" style={sprocketStyle} />
+    </div>
+  )
+}

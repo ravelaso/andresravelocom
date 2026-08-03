@@ -125,13 +125,13 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
 
       {loading && (
         <div className="text-center py-8">
-          <div className="inline-block w-8 h-8 border-4 border-gray-600 border-t-white rounded-full animate-spin" />
-          <p className="text-gray-400 mt-2">Loading more images...</p>
+          <div className="inline-block w-8 h-8 border-4 border-line border-t-amber rounded-full animate-spin" />
+          <p className="text-muted mt-2">Loading more images...</p>
         </div>
       )}
 
       {!loading && images.length === 0 && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted">
           <p>
             {hasFilters
               ? 'No images match the selected filters.'
@@ -141,7 +141,7 @@ const PhotoGallery: React.FC<PhotoGalleryProps> = ({ initialData }) => {
       )}
 
       {!hasMore && images.length > 0 && !hasFilters && (
-        <div className="text-center py-8 text-gray-500">
+        <div className="text-center py-8 text-muted">
           <p>You've reached the end of the gallery!</p>
         </div>
       )}

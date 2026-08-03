@@ -43,12 +43,12 @@ const NavBar: React.FC = () => {
 
     return (
         <>
-            <header className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur border-b border-white/5">
+            <header className="fixed top-0 left-0 w-full z-50 bg-ink-2/85 backdrop-blur-md border-b border-line shadow-[0_1px_0_0_rgba(0,0,0,0.5)]">
                 <div className="max-w-7xl mx-auto px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <a
                             href="/"
-                            className="text-white text-lg font-light tracking-[0.15em] uppercase hover:opacity-60 transition-opacity duration-300"
+                            className="text-paper text-lg font-light tracking-[0.15em] uppercase hover:opacity-60 transition-opacity duration-300"
                         >
                             Andres Ravelo
                         </a>
@@ -62,13 +62,13 @@ const NavBar: React.FC = () => {
                                         href={item.href}
                                         className={`relative text-sm tracking-[0.12em] uppercase font-light transition-colors duration-200 ${
                                             isActive
-                                                ? 'text-white'
-                                                : 'text-neutral-600 hover:text-white'
+                                                ? 'text-paper'
+                                                : 'text-muted hover:text-paper'
                                         }`}
                                     >
                                         {item.label}
                                         {isActive && (
-                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-white" />
+                                            <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-4 h-[1px] bg-amber" />
                                         )}
                                     </a>
                                 );
@@ -77,7 +77,7 @@ const NavBar: React.FC = () => {
 
                         <button
                             onClick={toggleMenu}
-                            className="md:hidden text-white hover:text-neutral-400 transition-colors focus:outline-none p-2"
+                            className="md:hidden text-paper hover:text-muted transition-colors focus:outline-none p-2"
                             aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
                         >
                             <div className="w-5 h-4 relative flex flex-col justify-between">
@@ -98,12 +98,12 @@ const NavBar: React.FC = () => {
 
             {isMenuOpen && (
                 <div
-                    className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
+                    className="fixed inset-0 bg-ink/70 backdrop-blur-sm z-40 md:hidden"
                     onClick={closeMenu}
                 />
             )}
 
-            <div className={`fixed top-16 left-0 right-0 bg-black/95 z-40 md:hidden transform transition-all duration-300 ${
+            <div className={`fixed top-16 left-0 right-0 bg-ink-2/95 z-40 md:hidden transform transition-all duration-300 ${
                 isMenuOpen
                     ? 'translate-y-0 opacity-100'
                     : '-translate-y-full opacity-0 pointer-events-none'
@@ -118,8 +118,8 @@ const NavBar: React.FC = () => {
                                 onClick={closeMenu}
                                 className={`block text-xl tracking-[0.15em] uppercase font-light transition-colors duration-200 ${
                                     isActive
-                                        ? 'text-white'
-                                        : 'text-neutral-600 hover:text-white'
+                                        ? 'text-paper'
+                                        : 'text-muted hover:text-paper'
                                 }`}
                             >
                                 {item.label}
@@ -128,8 +128,8 @@ const NavBar: React.FC = () => {
                     })}
                 </nav>
 
-                <div className="border-t border-white/5 px-8 py-6">
-                    <p className="text-neutral-700 text-xs tracking-wider uppercase">
+                <div className="border-t border-line px-8 py-6">
+                    <p className="text-faint text-xs tracking-wider uppercase">
                         &copy; 2026 Andres Ravelo
                     </p>
                 </div>

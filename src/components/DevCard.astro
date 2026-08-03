@@ -16,22 +16,22 @@ const { project } = Astro.props;
 const { title, description, date, url, tech } = project.data;
 ---
 
-<article class="flex flex-col min-h-[340px] h-full border border-neutral-800 rounded-xl bg-neutral-950 p-6 hover:border-neutral-600 transition">
+<article class="flex flex-col min-h-[340px] h-full border border-line rounded-xl bg-surface p-6 hover:border-muted/60 hover:bg-surface-2 shadow-lg shadow-black/20 transition">
   <div class="flex-1 flex flex-col">
-    <h3 class="text-xl font-semibold text-neutral-100 mb-1">{title}</h3>
-    <p class="text-neutral-400 text-sm mb-2">
+    <h3 class="text-xl font-semibold text-paper mb-1">{title}</h3>
+    <p class="text-muted text-sm mb-2">
       {date.toLocaleDateString(undefined, {
         year: "numeric",
         month: "short",
         day: "numeric",
       })}
     </p>
-    <p class="text-neutral-300 text-sm mb-4 flex-1">{description ?? "No description provided."}</p>
+    <p class="text-body text-sm mb-4 flex-1">{description ?? "No description provided."}</p>
     <div class="flex flex-wrap gap-2 mb-2">
       {(tech && tech.length > 0
         ? tech
         : ["No tags"]).map((t) => (
-        <span class="text-xs bg-neutral-900 text-neutral-400 px-2 py-1 rounded border border-neutral-700">
+        <span class="text-xs bg-ink-2 text-muted px-2 py-1 rounded border border-line">
           {t}
         </span>
       ))}
@@ -40,7 +40,7 @@ const { title, description, date, url, tech } = project.data;
   <div class="flex gap-2 mt-auto pt-4">
     <a
       href={`/dev/${project.id}`}
-      class="text-sm px-4 py-2 bg-neutral-100 text-black rounded hover:bg-neutral-200 transition"
+      class="text-sm px-4 py-2 bg-paper text-ink rounded hover:opacity-90 transition"
     >
       Read More
     </a>
@@ -48,7 +48,7 @@ const { title, description, date, url, tech } = project.data;
       <a
         href={url}
         target="_blank"
-        class="text-sm px-4 py-2 bg-neutral-800 text-neutral-300 rounded border border-neutral-700 hover:bg-neutral-700 transition"
+        class="text-sm px-4 py-2 bg-surface-2 text-body rounded border border-line hover:bg-muted/30 transition"
       >
         See Project
       </a>

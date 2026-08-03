@@ -2,7 +2,10 @@
 import Layout from '@/layouts/Layout.astro';
 import NavBar from '@/components/NavBar';
 import FilmStripCard from '@/components/FilmStripCard.astro';
-import InstagramLink from '@/components/InstagramLink.astro';
+import FilmStrip from '@/components/FilmStrip.astro';
+import RecentImages from '@/components/RecentImages.astro';
+import ExposeFilmSection from '@/components/ExposeFilmSection.astro';
+import ContactSection from '@/components/ContactSection.astro';
 import { getCollection } from "astro:content";
 
 export const prerender = false;
@@ -12,196 +15,24 @@ const aboutContent = await getCollection(
     (entry) => entry.data.type === "about",
 );
 const about = aboutContent[0];
-
-let featuredImages = [];
-try {
-    const response = await fetch(new URL("/api/photos?limit=10", Astro.url));
-    if (response.ok) {
-        const data = await response.json();
-        featuredImages = data.featured?.length ? data.featured.slice(0, 4) : data.images?.slice(0, 4) || [];
-    }
-} catch (error) {
-    console.error("Error loading preview images:", error);
-}
 ---
 
 <Layout title="Andres Ravelo — Film Photography">
     <NavBar client:only="react" />
 
     <FilmStripCard
+        class="mt-8 md:mt-10"
         title={about.data.title}
         description={about.data.description}
     />
 
-    <!-- Featured Work Preview -->
-    <section class="max-w-6xl mx-auto px-4 py-48">
-        <div class="text-center mb-16">
-            <h2 class="text-5xl md:text-6xl font-bold text-white mb-4">Recent Frames</h2>
-            <p class="text-gray-400 text-lg">A handful of frames from recent rolls</p>
-        </div>
+    <RecentImages />
 
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {
-                featuredImages.map((img) => (
-                    <a href="/gallery" class="group block overflow-hidden rounded-xl bg-neutral-900 aspect-[3/2]">
-                        <img
-                            src={img.url}
-                            alt={img.title}
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                        />
-                    </a>
-                ))
-            }
-        </div>
+    <FilmStrip />
 
-        <div class="text-center mt-12">
-            <a
-                href="/gallery"
-                class="inline-flex items-center gap-2 px-8 py-4 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition group"
-            >
-                View Full Gallery
-                <svg class="w-5 h-5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-            </a>
-        </div>
-    </section>
+    <ExposeFilmSection />
 
-    <!-- Expose Film Section -->
-    <section class="max-w-5xl mx-auto px-4 py-48 border-t border-neutral-900">
-        <div class="text-center">
-            <p class="text-xs tracking-[0.25em] uppercase text-neutral-500 mb-4">In Development</p>
-            <h2 class="text-5xl md:text-6xl font-bold text-white mb-4">Expose Film</h2>
-            <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-8 leading-relaxed">
-                A film photography companion app for iOS and Android. Meter light, track frames across rolls,
-                and keep a memorandum of every exposure. Built with Flutter.
-            </p>
-            <a
-                href="/expose-film"
-                class="inline-flex items-center gap-2 text-neutral-300 border-b border-neutral-700 pb-0.5 hover:text-white hover:border-white transition-colors duration-200"
-            >
-                Learn more about the app
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
-                </svg>
-            </a>
-        </div>
-    </section>
+    <FilmStrip />
 
-    <!-- Contact Section -->
-    <section class="max-w-lg mx-auto px-4 py-48 border-t border-neutral-900">
-        <div class="text-center mb-16">
-            <h2 class="text-5xl md:text-6xl font-bold text-white mb-4">Get in Touch</h2>
-            <p class="text-gray-400 text-lg">
-                Interested in a photoshoot or collaboration?
-            </p>
-            <div class="mt-8 flex justify-center">
-                <InstagramLink />
-            </div>
-        </div>
-
-        <div class="bg-neutral-900/50 border border-neutral-800 rounded-2xl p-8" id="contact-form-container">
-            <form id="contact-form" class="space-y-6">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-300 mb-2">
-                        Name
-                    </label>
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        required
-                        class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-gray-500 transition"
-                        placeholder="Your name"
-                    />
-                </div>
-
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
-                        Email
-                    </label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-gray-500 transition"
-                        placeholder="you@example.com"
-                    />
-                </div>
-
-                <div>
-                    <label for="message" class="block text-sm font-medium text-gray-300 mb-2">
-                        Message
-                    </label>
-                    <textarea
-                        id="message"
-                        name="message"
-                        rows={5}
-                        required
-                        class="w-full px-4 py-3 bg-neutral-800 border border-neutral-700 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 focus:border-gray-500 transition resize-none"
-                        placeholder="Tell me about your project..."
-                    ></textarea>
-                </div>
-
-                <div class="cf-turnstile flex justify-center" data-sitekey="0x4AAAAAAEB6wrmj0-D8DRzu" data-action="contact-form" data-theme="dark"></div>
-
-                <button
-                    type="submit"
-                    id="submit-btn"
-                    class="w-full py-3 px-6 bg-white text-black font-semibold rounded-xl hover:bg-gray-200 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    Send Message
-                </button>
-            </form>
-        </div>
-
-    </section>
+    <ContactSection />
 </Layout>
-
-<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-<script>
-document.getElementById('contact-form')?.addEventListener('submit', async function (e) {
-    e.preventDefault();
-    const btn = document.getElementById('submit-btn');
-    const token = document.querySelector('[name="cf-turnstile-response"]')?.value;
-
-    if (!token) {
-        alert('Please complete the verification.');
-        return;
-    }
-
-    btn.disabled = true;
-    btn.textContent = 'Sending...';
-
-    const form = e.target;
-    const data = {
-        name: form.name.value,
-        email: form.email.value,
-        message: form.message.value,
-        token,
-    };
-
-    try {
-        const res = await fetch('/api/contact', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-        });
-
-        if (res.ok) {
-            form.innerHTML = '<div class="text-center py-8"><p class="text-gray-300 text-lg">Thanks! I\'ll get back to you soon.</p></div>';
-        } else {
-            const err = await res.json();
-            btn.disabled = false;
-            btn.textContent = 'Send Message';
-            alert(err.error || 'Something went wrong.');
-        }
-    } catch {
-        btn.disabled = false;
-        btn.textContent = 'Send Message';
-        alert('Network error. Please try again.');
-    }
-});
-</script>

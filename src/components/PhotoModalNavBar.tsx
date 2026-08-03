@@ -11,14 +11,14 @@ interface PhotoModalNavBarProps {
 const PhotoModalNavBar: React.FC<PhotoModalNavBarProps> = ({
   isFirst, isLast, onPrev, onNext, onClose,
 }) => (
-  <div className="flex items-center justify-center gap-4 px-6 py-3 bg-black/40 border-t border-gray-800">
+  <div className="flex items-center justify-center gap-4 px-6 py-3 bg-ink/40 border-t border-line">
     <button
       onClick={onPrev}
       disabled={isFirst}
       className={`rounded-full p-2.5 transition-colors ${
         isFirst
-          ? 'text-gray-700 bg-transparent cursor-default'
-          : 'text-gray-200 bg-white/10 hover:bg-white/20'
+          ? 'text-faint bg-transparent cursor-default'
+          : 'text-body bg-paper/10 hover:bg-paper/20'
       }`}
       aria-label="Previous"
     >
@@ -29,7 +29,7 @@ const PhotoModalNavBar: React.FC<PhotoModalNavBarProps> = ({
 
     <button
       onClick={onClose}
-      className="rounded-full p-2.5 text-gray-300 hover:text-white bg-white/10 hover:bg-white/20 transition-colors"
+      className="rounded-full p-2.5 text-body hover:text-paper bg-paper/10 hover:bg-paper/20 transition-colors"
       aria-label="Close"
     >
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -42,8 +42,8 @@ const PhotoModalNavBar: React.FC<PhotoModalNavBarProps> = ({
       disabled={isLast}
       className={`rounded-full p-2.5 transition-colors ${
         isLast
-          ? 'text-gray-700 bg-transparent cursor-default'
-          : 'text-gray-200 bg-white/10 hover:bg-white/20'
+          ? 'text-faint bg-transparent cursor-default'
+          : 'text-body bg-paper/10 hover:bg-paper/20'
       }`}
       aria-label="Next"
     >

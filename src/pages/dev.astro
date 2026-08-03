@@ -40,8 +40,8 @@ const cloud = aboutEntry?.data.cloud ?? [];
   >
     <!-- About Text -->
     <div>
-      <h1 class="text-4xl font-bold text-neutral-100 mb-4">Development Work</h1>
-      <p class="text-neutral-400 text-lg">
+      <h1 class="text-4xl font-bold text-paper mb-4">Development Work</h1>
+      <p class="text-body text-lg">
         {
           aboutEntry?.data.description ??
             "A collection of practical tools and sites I’ve built using modern web technologies."
@@ -52,11 +52,11 @@ const cloud = aboutEntry?.data.cloud ?? [];
     <!-- Skills List -->
     <div class="space-y-8">
       <div>
-        <h3 class="text-lg font-semibold text-neutral-100 mb-2">Frontend</h3>
+        <h3 class="text-lg font-semibold text-paper mb-2">Frontend</h3>
         <ul class="flex flex-wrap gap-2">
           {
             frontend.map((tech) => (
-              <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
+              <li class="bg-ink-2 text-body px-3 py-1 text-sm border border-line rounded-full">
                 {tech}
               </li>
             ))
@@ -65,11 +65,11 @@ const cloud = aboutEntry?.data.cloud ?? [];
       </div>
 
       <div>
-        <h3 class="text-lg font-semibold text-neutral-100 mb-2">Backend</h3>
+        <h3 class="text-lg font-semibold text-paper mb-2">Backend</h3>
         <ul class="flex flex-wrap gap-2">
           {
             backend.map((tech) => (
-              <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
+              <li class="bg-ink-2 text-body px-3 py-1 text-sm border border-line rounded-full">
                 {tech}
               </li>
             ))
@@ -78,13 +78,13 @@ const cloud = aboutEntry?.data.cloud ?? [];
       </div>
 
       <div>
-        <h3 class="text-lg font-semibold text-neutral-100 mb-2">
+        <h3 class="text-lg font-semibold text-paper mb-2">
           Cloud & DevOps
         </h3>
         <ul class="flex flex-wrap gap-2">
           {
             cloud.map((tech) => (
-              <li class="bg-neutral-900 text-neutral-300 px-3 py-1 text-sm border border-neutral-700 rounded-full">
+              <li class="bg-ink-2 text-body px-3 py-1 text-sm border border-line rounded-full">
                 {tech}
               </li>
             ))
@@ -95,7 +95,7 @@ const cloud = aboutEntry?.data.cloud ?? [];
   </section>
 
   <section
-    class="bg-neutral-950 p-10 m-10 max-w-5xl mx-auto px-4 grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pb-32"
+    class="bg-surface/70 border border-line p-10 m-10 max-w-5xl mx-auto rounded-2xl grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 pb-32"
   >
     {sortedProjects.map((project) => <DevCard project={project} />)}
   </section>

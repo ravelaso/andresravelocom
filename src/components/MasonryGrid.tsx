@@ -139,7 +139,7 @@ const MasonryGrid: React.FC<MasonryGridProps> = ({ images, onImageClick }) => {
                 style={{ animationDelay: `${i * 0.05}s` }}
               />
             ) : (
-              <div className="bg-gray-800 rounded-lg w-full h-full" />
+              <div className="bg-surface-2 rounded-lg w-full h-full" />
             )}
           </div>
         );

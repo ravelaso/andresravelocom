@@ -7,6 +7,17 @@
 @theme {
   --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif;
   --font-serif: 'Playfair Display', ui-serif, Georgia, serif;
+
+  --color-ink: #151413;
+  --color-ink-2: #1c1b1a;
+  --color-surface: #242322;
+  --color-surface-2: #2d2b29;
+  --color-line: #ffffff14;
+  --color-paper: #ece7e0;
+  --color-body: #b8b2a7;
+  --color-muted: #8a847a;
+  --color-faint: #57534b;
+  --color-amber: #d9a441;
 }
 
 @layer base {
