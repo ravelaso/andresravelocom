@@ -1,0 +1,9 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import NavBar from "@/components/NavBar";
+---
+
+<Layout title="Expose Film — Andres Ravelo">
+    <NavBar client:only="react" />
+    <iframe src="/recipe/index.html" />
+</Layout>
