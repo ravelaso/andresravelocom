@@ -12,13 +12,17 @@ import FilmStrip from "@/components/FilmStrip.astro";
         <Hero
             eyebrow="Web Preview"
             title="Recipe Developer"
-            description="Explore the film chemicals library and build your development recipe right in the browser. A sneak peek of the Expose Film app — no download needed."
+            description="Explore the film chemicals library and build your development recipe right in the browser. A sneak peek of the Expose Film  app — no download needed."
         >
             <div class="flex flex-wrap justify-center gap-2">
-                <span class="bg-surface-2 text-body text-sm px-3 py-1 rounded-full border border-line">
+                <span
+                    class="bg-surface-2 text-body text-sm px-3 py-1 rounded-full border border-line"
+                >
                     Film database
                 </span>
-                <span class="bg-surface-2 text-body text-sm px-3 py-1 rounded-full border border-line">
+                <span
+                    class="bg-surface-2 text-body text-sm px-3 py-1 rounded-full border border-line"
+                >
                     Developer recipes
                 </span>
             </div>
@@ -27,23 +31,37 @@ import FilmStrip from "@/components/FilmStrip.astro";
         <FilmStrip />
 
         <section class="py-24">
-            <div class="max-w-5xl mx-auto px-4 grid md:grid-cols-2 gap-12 lg:gap-16 items-center">
+            <div
+                class="max-w-5xl mx-auto px-4 grid md:grid-cols-2 gap-12 lg:gap-16 items-center"
+            >
                 <div class="space-y-6">
-                    <p class="text-xs tracking-[0.25em] uppercase text-muted mb-4">In Development</p>
-                    <h2 class="text-5xl md:text-6xl font-bold text-paper">Try it in the browser</h2>
+                    <p
+                        class="text-xs tracking-[0.25em] uppercase text-muted mb-4"
+                    >
+                        In Development
+                    </p>
+                    <h2 class="text-5xl md:text-6xl font-bold text-paper">
+                        Try it in the browser
+                    </h2>
                     <p class="text-body text-lg leading-relaxed">
-                        This is a live web preview of Expose Film's recipe developer — the film
-                        chemicals browser and development recipe helper. Use it freely during the
-                        development phase to explore film stocks and dial in your recipe.
+                        This is a live web preview of Expose Film's recipe
+                        developer — the film chemicals browser and development
+                        recipe helper. Use it freely during the development
+                        phase to explore film stocks and dial in your recipe.
                     </p>
                 </div>
 
-                <div class="bg-surface/60 border border-line rounded-2xl p-8 lg:p-10 space-y-4">
-                    <p class="text-amber text-sm tracking-[0.25em] uppercase">App only</p>
+                <div
+                    class="bg-surface/60 border border-line rounded-2xl p-8 lg:p-10 space-y-4"
+                >
+                    <p class="text-amber text-sm tracking-[0.25em] uppercase">
+                        App only
+                    </p>
                     <p class="text-body leading-relaxed">
-                        The <strong class="text-paper">light meter</strong>, roll management, and the
-                        rest of the darkroom tools are available in the iOS &amp; Android app. This
-                        web version is limited to the development phase workflow.
+                        The <strong class="text-paper">light meter</strong>,
+                        roll management, and the rest of the darkroom tools are
+                        available in the iOS &amp; Android app. This web version
+                        is limited to the development phase workflow.
                     </p>
                 </div>
             </div>
@@ -52,9 +70,13 @@ import FilmStrip from "@/components/FilmStrip.astro";
         <FilmStrip />
 
         <section class="py-24">
-            <div class="max-w-sm mx-auto px-4">
-                <div class="rounded-[2rem] overflow-hidden border border-line bg-ink-2 shadow-2xl">
-                    <iframe class="w-full h-[780px] border-0" src="/recipe/index.html" />
+            <div class="w-full max-w-sm md:max-w-lg mx-auto px-4">
+                <div
+                    class="rounded-[2rem] overflow-hidden border border-line bg-ink-2 shadow-2xl"
+                >
+                    <iframe
+                        class="w-full h-[780px] md:h-[720px] border-0"
+                        src="/recipe/index.html"></iframe>
                 </div>
             </div>
         </section>
