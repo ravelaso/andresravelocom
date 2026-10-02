@@ -39,6 +39,7 @@ const NavBar: React.FC = () => {
     const navItems: NavItem[] = [
         { href: '/gallery', label: 'Gallery' },
         { href: '/expose-film', label: 'Expose Film' },
+        { href: '/recipes', label: 'Recipes' },
     ];
 
     return (
